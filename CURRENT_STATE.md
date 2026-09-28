@@ -13,7 +13,8 @@
 - schemas oficiais EA11, EA12, EA14, EA15 e EA20 mapeados em `docs/TSE_SCHEMAS.md`;
 - URLs, campos condicionais e regras semânticas necessárias às próximas fixtures e validações documentadas;
 - sete fixtures TSE reduzidas disponíveis em `tests/fixtures/tse`, cobrindo configuração, acompanhamento, majoritário, proporcional e município;
-- parser e schemas Zod para EA11, EA12, EA14, EA15 e EA20 implementados, incluindo validações aritméticas e de abrangência.
+- parser e schemas Zod para EA11, EA12, EA14, EA15 e EA20 implementados, incluindo validações aritméticas e de abrangência;
+- normalizador EA20 converte os cinco cargos do MVP para o modelo interno tipado do PR+.
 
 ## Em desenvolvimento
 
@@ -34,7 +35,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-continuando pelo normalizador para o modelo interno PR+ (TSE-004).
+continuando pelo fetch server-side com timeout e limite de payload (TSE-005).
 
 ## Handoff TSE-001
 
@@ -60,3 +61,12 @@ continuando pelo normalizador para o modelo interno PR+ (TSE-004).
 - validação: 11 testes automatizados, typecheck e build passam; nove payloads completos do simulado oficial passaram pelos schemas;
 - divergências cobertas: `cdi` vazio no exterior, `nfed` vazio, contadores municipais opcionais no EA14 Brasil e siglas longas de teste no EA20;
 - falta: normalizar o EA20 validado para o modelo interno PR+.
+
+## Handoff TSE-004
+
+- feito: modelo interno PR+ ampliado e normalizador EA20 para Presidente, Governador, Senador, Deputado Federal e Deputado Estadual;
+- dados normalizados: abrangência, cargo, fase, horários, progresso, seções, eleitorado, votos, candidatos, chapas, substituições e situação eleitoral;
+- compatibilidade: os campos originais usados pela API (`scope`, `office`, `updatedAt`, `progress` e `candidates`) foram preservados;
+- validação: 17 testes e typecheck passam; os cinco cargos também foram normalizados a partir dos payloads completos do simulado;
+- decisão: horários TSE são expostos em ISO 8601 com offset de Brasília (`-03:00`) no ciclo de 2026;
+- falta: buscar os arquivos server-side e validar a coerência entre a requisição e o payload retornado.

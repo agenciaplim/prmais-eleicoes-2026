@@ -53,3 +53,11 @@ A identidade visual utilizada será a do PR+.
 **Decisão:** não acoplar o componente de live a um provedor específico.
 
 **Contexto:** Instagram é a primeira hipótese, ainda sujeita à decisão operacional final.
+
+---
+
+## 2026-09-28 — Horários TSE em ISO 8601
+
+**Decisão:** tratar os horários publicados pelo TSE no ciclo de 2026 como horário de Brasília e expô-los no modelo interno em ISO 8601 com offset `-03:00`.
+
+**Motivo:** remover a dependência do locale e do fuso do servidor sem perder o horário original da totalização.

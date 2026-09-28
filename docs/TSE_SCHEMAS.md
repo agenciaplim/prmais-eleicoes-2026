@@ -315,10 +315,13 @@ Os pares percentuais usam o mesmo padrão de exibição e precisão (`pvap`/`pva
 9. Converter vírgula decimal de forma explícita no normalizador, sem depender de locale do processo.
 10. Nunca promover payload inválido ao last-known-good.
 
+### Modelo interno PR+
+
+O normalizador EA20 retorna um resultado por cargo e mantém o formato externo isolado em `src/lib/tse`. O contrato interno usa números JavaScript para contagens validadas, percentuais precisos com ponto decimal, enums em inglês e horários ISO 8601 com offset de Brasília (`-03:00`).
+
+Além dos campos já consumidos pela API (`scope`, `office`, `updatedAt`, `progress` e `candidates`), o modelo inclui eleição/turno/fase, tipo de abrangência, totalização final, seções, eleitorado, votos, vagas, quociente eleitoral, chapas e situações de candidatura. Consultas populares e códigos de cargo fora do MVP são rejeitados explicitamente pelo normalizador.
+
 ## Pontos em aberto para as próximas tarefas
 
-- TSE-002 deve criar fixtures pequenas e representativas, sem copiar payloads completos de centenas de KB.
-- As fixtures precisam cobrir majoritário, proporcional, município, campos condicionais ausentes, destinação anulada/sub judice e candidato substituído.
-- TSE-003 deve separar schema de entrada (strings do TSE) de tipos normalizados (números e datas internas).
 - A configuração atual possui um único `TSE_ELECTION_ID`, mas o MVP consome ao menos as eleições federal e estadual. A modelagem da configuração deve ser ajustada na tarefa de fetch, sem fixar os códigos de 2026 no código.
 - Antes da operação oficial, repetir a conferência das versões dos PDFs e executar as fixtures contra uma janela de simulado ou carga oficial zerada.
