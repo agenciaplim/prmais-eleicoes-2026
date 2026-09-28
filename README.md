@@ -20,6 +20,8 @@ Abra `http://localhost:3000`.
 
 O projeto inicia com `CACHE_DRIVER=memory`, portanto **não é necessário criar Redis, Vercel ou AWS para começar**.
 
+O acesso remoto ao TSE permanece desligado no ambiente local. Para habilitá-lo explicitamente, use `TSE_ENV=remote` e configure um dos pares de base/ambiente documentados em `docs/TSE_SCHEMAS.md`; o código não aceita origens fora da allowlist oficial.
+
 Quando o Upstash estiver configurado, altere:
 
 ```env

@@ -49,6 +49,11 @@ Arquivos necessários para o MVP:
 
 O host deve vir de configuração interna e ser comparado com uma allowlist. Nunca aceitar host, URL ou caminho fornecido pelo usuário.
 
+Origens permitidas em 2026:
+
+- oficial: base `https://resultados.tse.jus.br`, ambiente `oficial`;
+- simulado: base `https://resultados-sim.tse.jus.br/simulado`, ambiente `simulado2026`.
+
 ```text
 EA11  <base>/<ambiente>/comum/config/ele-c.json
 EA12  <base>/<ambiente>/<ciclo>/<eleicao>/config/mun-e<eleicao-6>-cm.json
@@ -70,6 +75,8 @@ Regras de formato:
 - eleição com 6 dígitos e prefixo `e`;
 - o caminho deve ser montado por funções específicas para cada tipo de arquivo;
 - não transformar `arq[].dir` em proxy genérico nem aceitar tokens fora do conjunto documentado.
+
+O cliente usa timeout de 5 segundos e limite de 5 MiB por payload por padrão. O limite é verificado pelo `Content-Length`, quando presente, e novamente durante o streaming do corpo descomprimido. Redirects são recusados e a fase, eleição, UF, abrangência e cargo do payload são comparados com a requisição.
 
 ## Convenções de tipos
 

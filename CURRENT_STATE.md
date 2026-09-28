@@ -14,11 +14,12 @@
 - URLs, campos condicionais e regras semânticas necessárias às próximas fixtures e validações documentadas;
 - sete fixtures TSE reduzidas disponíveis em `tests/fixtures/tse`, cobrindo configuração, acompanhamento, majoritário, proporcional e município;
 - parser e schemas Zod para EA11, EA12, EA14, EA15 e EA20 implementados, incluindo validações aritméticas e de abrangência;
-- normalizador EA20 converte os cinco cargos do MVP para o modelo interno tipado do PR+.
+- normalizador EA20 converte os cinco cargos do MVP para o modelo interno tipado do PR+;
+- cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload.
 
 ## Em desenvolvimento
 
-- integração real com arquivos do TSE;
+- integração da coleta TSE com cache e API;
 - conexão com Upstash Redis;
 - interface completa conforme wireframe e identidade PR+.
 
@@ -35,7 +36,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-continuando pelo fetch server-side com timeout e limite de payload (TSE-005).
+continuando pelo armazenamento last-known-good (TSE-006).
 
 ## Handoff TSE-001
 
@@ -70,3 +71,12 @@ continuando pelo fetch server-side com timeout e limite de payload (TSE-005).
 - validação: 17 testes e typecheck passam; os cinco cargos também foram normalizados a partir dos payloads completos do simulado;
 - decisão: horários TSE são expostos em ISO 8601 com offset de Brasília (`-03:00`) no ciclo de 2026;
 - falta: buscar os arquivos server-side e validar a coerência entre a requisição e o payload retornado.
+
+## Handoff TSE-005
+
+- feito: cliente server-side tipado para EA11, EA12, EA14, EA15 e EA20, com caminhos específicos e sem suporte a URL fornecida por usuário;
+- segurança: allowlist dos hosts oficial/simulado, HTTPS obrigatório, redirects bloqueados, timeout durante headers e streaming, content type e limite de 5 MiB por padrão;
+- coerência: fase, eleição, UF, abrangência e cargo são comparados com a requisição antes do retorno;
+- configuração: acesso remoto exige `TSE_ENV=remote`; timeout e limite de payload podem ser reduzidos por ambiente dentro de limites defensivos;
+- validação: 27 testes e typecheck passam; os cinco tipos de arquivo foram buscados e validados no simulado oficial, incluindo os 399 municípios do Paraná;
+- falta: promover somente snapshots válidos ao last-known-good e conectar a coleta à API sem fetch por requisição pública.

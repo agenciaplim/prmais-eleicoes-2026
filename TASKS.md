@@ -18,7 +18,7 @@ Legenda:
 - [x] TSE-002 Criar fixtures locais representativas — Codex (`codex/tse-schemas`)
 - [x] TSE-003 Implementar parser e validação Zod — Codex (`codex/tse-schemas`)
 - [x] TSE-004 Implementar normalizador para modelo PR+ — Codex (`codex/tse-schemas`)
-- [ ] TSE-005 Implementar fetch server-side com timeout e limite de payload
+- [x] TSE-005 Implementar fetch server-side com timeout e limite de payload — Codex (`codex/tse-schemas`)
 - [ ] TSE-006 Implementar last-known-good
 - [ ] TSE-007 Adicionar validação JWS quando aplicável
 
