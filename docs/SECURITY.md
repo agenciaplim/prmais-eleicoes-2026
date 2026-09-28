@@ -1,0 +1,91 @@
+# Segurança
+
+O objetivo é manter uma base segura sem aumentar desnecessariamente a complexidade.
+
+## Regras obrigatórias
+
+### 1. TSE somente server-side
+
+O browser não acessa endpoints do TSE.
+
+### 2. Fonte externa fixa
+
+Usuários não podem fornecer URL, host ou caminho para o coletor acessar.
+
+Evitar SSRF e proxies genéricos.
+
+### 3. Validar tudo que vem de fora
+
+Antes de publicar dados:
+
+```text
+fetch
+-> verificar status HTTP
+-> limitar tamanho
+-> validar tipo esperado
+-> parse
+-> validar schema
+-> validar campos semânticos
+-> normalizar
+-> promover como último resultado válido
+```
+
+### 4. Last-known-good
+
+Falha de rede, schema ou assinatura nunca limpa os resultados atuais.
+
+A aplicação mantém o último snapshot válido e informa sua data/hora.
+
+### 5. Secrets
+
+Nunca commitar:
+
+- `.env.local`;
+- tokens Upstash;
+- tokens Vercel;
+- certificados/chaves privadas;
+- qualquer credencial.
+
+### 6. HTML externo
+
+Conteúdo externo é texto/dado, não HTML.
+
+Evitar `dangerouslySetInnerHTML`.
+
+### 7. API pública pequena
+
+Não criar endpoints genéricos de consulta ou execução.
+
+### 8. Cache
+
+Usuários consultam nosso cache. Uma requisição pública nunca deve disparar uma nova consulta individual ao TSE.
+
+### 9. Timeouts e retry
+
+Toda chamada ao TSE deve ter timeout.
+
+Retry deve ter limite e backoff.
+
+### 10. Headers e edge
+
+Na produção, configurar HTTPS, CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy` e proteções de edge/WAF disponíveis.
+
+### 11. Rate limit
+
+Aplicar rate limiting nos endpoints públicos quando a hospedagem estiver definida.
+
+### 12. Logs
+
+Não registrar tokens, segredos ou credenciais.
+
+Registrar erros de coleta e horário do último sucesso.
+
+### 13. Dependências
+
+Manter poucas dependências e lockfile versionado após a primeira instalação.
+
+### 14. Produção
+
+Nenhum fixture ou mock pode ser selecionado silenciosamente em produção.
+
+A aplicação deve falhar de forma segura se configuração obrigatória estiver ausente.
