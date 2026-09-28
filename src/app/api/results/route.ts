@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import { getCache } from "@/lib/cache";
 import { mockResult } from "@/lib/tse/mock";
-import type { ElectionResult } from "@/lib/tse/types";
+import { readLastKnownGood } from "@/lib/tse/last-known-good";
 
 export async function GET() {
   const cache = await getCache();
-  const cached = await cache.get<ElectionResult>("results:president:br");
+  const snapshot = await readLastKnownGood(cache, {
+    scope: "BR",
+    scopeType: "country",
+    office: "president"
+  });
 
-  return NextResponse.json(cached ?? mockResult, {
+  if (!snapshot && process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "results unavailable" }, { status: 503 });
+  }
+
+  return NextResponse.json(snapshot?.data ?? mockResult, {
     headers: {
-      "Cache-Control": "public, max-age=5, stale-while-revalidate=30"
+      "Cache-Control": snapshot ? "public, max-age=5, stale-while-revalidate=30" : "no-store",
+      ...(snapshot ? { "X-Result-Stored-At": snapshot.storedAt } : {})
     }
   });
 }

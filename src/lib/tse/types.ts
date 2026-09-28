@@ -80,6 +80,7 @@ export type VoteTotals = {
 };
 
 export type ElectionResult = {
+  sourceId: string;
   electionId: string;
   round: 1 | 2;
   phase: ElectionPhase;

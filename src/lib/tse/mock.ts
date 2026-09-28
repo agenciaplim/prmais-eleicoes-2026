@@ -1,6 +1,7 @@
 import type { ElectionResult } from "./types";
 
 export const mockResult: ElectionResult = {
+  sourceId: "0",
   electionId: "0",
   round: 1,
   phase: "simulation",

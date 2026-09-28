@@ -136,6 +136,7 @@ export function normalizeEa20(payload: Ea20Payload): ElectionResult[] {
       .sort((left, right) => left.rank - right.rank);
 
     return {
+      sourceId: payload.idg,
       electionId: payload.ele,
       round: toNumber(payload.t) as 1 | 2,
       phase: (payload.f === "s" ? "simulation" : "official") satisfies ElectionPhase,

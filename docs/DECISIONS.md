@@ -61,3 +61,11 @@ A identidade visual utilizada será a do PR+.
 **Decisão:** tratar os horários publicados pelo TSE no ciclo de 2026 como horário de Brasília e expô-los no modelo interno em ISO 8601 com offset `-03:00`.
 
 **Motivo:** remover a dependência do locale e do fuso do servidor sem perder o horário original da totalização.
+
+---
+
+## 2026-09-28 — Last-known-good sem expiração
+
+**Decisão:** armazenar resultados normalizados em envelope versionado, sem TTL, e promover somente snapshots válidos que não representem regressão de fase ou totalização.
+
+**Motivo:** falhas temporárias do TSE, do coletor ou do cache não podem retirar do ar o último resultado eleitoral confiável.

@@ -19,7 +19,7 @@ Legenda:
 - [x] TSE-003 Implementar parser e validação Zod — Codex (`codex/tse-schemas`)
 - [x] TSE-004 Implementar normalizador para modelo PR+ — Codex (`codex/tse-schemas`)
 - [x] TSE-005 Implementar fetch server-side com timeout e limite de payload — Codex (`codex/tse-schemas`)
-- [ ] TSE-006 Implementar last-known-good
+- [x] TSE-006 Implementar last-known-good — Codex (`codex/tse-schemas`)
 - [ ] TSE-007 Adicionar validação JWS quando aplicável
 
 ## Cache

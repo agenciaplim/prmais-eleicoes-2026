@@ -15,7 +15,8 @@
 - sete fixtures TSE reduzidas disponíveis em `tests/fixtures/tse`, cobrindo configuração, acompanhamento, majoritário, proporcional e município;
 - parser e schemas Zod para EA11, EA12, EA14, EA15 e EA20 implementados, incluindo validações aritméticas e de abrangência;
 - normalizador EA20 converte os cinco cargos do MVP para o modelo interno tipado do PR+;
-- cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload.
+- cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload;
+- snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática.
 
 ## Em desenvolvimento
 
@@ -36,7 +37,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-continuando pelo armazenamento last-known-good (TSE-006).
+continuando pela validação JWS dos arquivos que disponibilizarem assinatura (TSE-007).
 
 ## Handoff TSE-001
 
@@ -80,3 +81,13 @@ continuando pelo armazenamento last-known-good (TSE-006).
 - configuração: acesso remoto exige `TSE_ENV=remote`; timeout e limite de payload podem ser reduzidos por ambiente dentro de limites defensivos;
 - validação: 27 testes e typecheck passam; os cinco tipos de arquivo foram buscados e validados no simulado oficial, incluindo os 399 municípios do Paraná;
 - falta: promover somente snapshots válidos ao last-known-good e conectar a coleta à API sem fetch por requisição pública.
+
+## Handoff TSE-006
+
+- feito: envelope last-known-good versionado, chave por cargo/abrangência e schema runtime completo do modelo interno;
+- promoção: aceita apenas resultados normalizados válidos, não regride horário/fase e não regrava o mesmo `sourceId` do TSE;
+- retenção: snapshots não usam TTL; erros de validação ou escrita não removem o valor anterior;
+- API: continua cache-only, informa `X-Result-Stored-At` e retorna `503` em produção quando não há snapshot, sem fallback silencioso para mock;
+- validação: 33 testes, typecheck e build passam;
+- risco: a comparação de frescor usa leitura seguida de escrita e pressupõe o coletor único definido na arquitetura; múltiplos coletores exigiriam compare-and-set no Redis;
+- falta: validar assinaturas JWS quando disponibilizadas e criar o agendamento/coletor que promove resultados.

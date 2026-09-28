@@ -1,6 +1,7 @@
 import { memoryCache } from "./memory";
+import type { CacheStore } from "./types";
 
-export async function getCache() {
+export async function getCache(): Promise<CacheStore> {
   const driver = process.env.CACHE_DRIVER ?? "memory";
 
   if (driver === "upstash") {
@@ -8,10 +9,13 @@ export async function getCache() {
     const redis = Redis.fromEnv();
     return {
       get: <T>(key: string) => redis.get<T>(key),
-      set: (key: string, value: unknown, ttlSeconds?: number) =>
-        redis.set(key, value, ttlSeconds ? { ex: ttlSeconds } : undefined)
+      async set(key: string, value: unknown, ttlSeconds?: number): Promise<void> {
+        await redis.set(key, value, ttlSeconds ? { ex: ttlSeconds } : undefined);
+      }
     };
   }
 
   return memoryCache;
 }
+
+export type { CacheStore } from "./types";
