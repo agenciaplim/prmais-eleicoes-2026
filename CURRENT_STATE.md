@@ -19,6 +19,7 @@
 - snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática;
 - modo JWS obrigatório verifica EdDSA/Ed25519, `kid` e assinatura com as chaves públicas oficiais de cada ambiente.
 - adaptador Upstash Redis disponível com configuração validada e cache em memória isolado e restrito ao desenvolvimento.
+- coletor server-side descobre eleições pelo EA11 e promove seis resultados agregados, acionado apenas por rota interna autenticada.
 
 ## Em desenvolvimento
 
@@ -39,7 +40,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-orquestrar descoberta, coleta, normalização e promoção server-side (TSE-008).
+expor os resultados promovidos por cargo e abrangência na API cache-only (API-001).
 
 ## Handoff TSE-001
 
@@ -120,3 +121,12 @@ orquestrar descoberta, coleta, normalização e promoção server-side (TSE-008)
 - segurança: mutações no objeto original ou retornado não alteram o snapshot armazenado;
 - validação: 45 testes e typecheck passam;
 - falta: implementar o coletor server-side que usa o cache selecionado pelo ambiente.
+
+## Handoff TSE-008
+
+- feito: descoberta de eleição federal/estadual pelo EA11, suporte a primeiro/segundo turno e plano de coleta por cargo/abrangência;
+- primeiro turno: Presidente BR/PR, Governador PR, Senador PR, Deputado Federal PR e Deputado Estadual PR;
+- resiliência: cada EA20 é processado independentemente e falha isolada não impede a promoção dos demais;
+- acionamento: `GET`/`POST /api/internal/collect` exige Bearer `COLLECTOR_SECRET` com pelo menos 32 caracteres e nunca é chamado pela API pública;
+- validação: 51 testes, typecheck e build passam; a prova online promoveu os seis resultados usando sete arquivos JWS reais do simulado;
+- falta: ampliar `/api/results` para selecionar identidades permitidas no cache e depois adicionar o catálogo de localidades.

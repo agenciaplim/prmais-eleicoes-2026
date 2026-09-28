@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CacheConfigError, cacheConfigFromEnv, createMemoryCache, createUpstashCache } from "../src/lib/cache";
+import {
+  CollectorAuthConfigError,
+  collectorSecretFromEnv,
+  isCollectorAuthorized
+} from "../src/lib/security/collector-auth";
 
 test("uses memory cache by default outside production", () => {
   assert.deepEqual(cacheConfigFromEnv({}, "development"), { driver: "memory" });
@@ -112,4 +117,14 @@ test("rejects invalid TTLs consistently", async () => {
 
   await assert.rejects(() => memory.set("key", "value", 0), RangeError);
   await assert.rejects(() => upstash.set("key", "value", 1.5), RangeError);
+});
+
+test("requires a strong collector secret and compares bearer tokens safely", () => {
+  assert.throws(() => collectorSecretFromEnv({ COLLECTOR_SECRET: "short" }), CollectorAuthConfigError);
+
+  const secret = "a-secure-local-collector-secret-123456";
+  assert.equal(collectorSecretFromEnv({ COLLECTOR_SECRET: secret }), secret);
+  assert.equal(isCollectorAuthorized(`Bearer ${secret}`, secret), true);
+  assert.equal(isCollectorAuthorized("Bearer incorrect", secret), false);
+  assert.equal(isCollectorAuthorized(null, secret), false);
 });

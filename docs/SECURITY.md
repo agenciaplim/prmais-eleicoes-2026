@@ -48,6 +48,7 @@ Nunca commitar:
 - `.env.local`;
 - tokens Upstash;
 - tokens Vercel;
+- `COLLECTOR_SECRET`;
 - certificados/chaves privadas;
 - qualquer credencial.
 
@@ -60,6 +61,8 @@ Evitar `dangerouslySetInnerHTML`.
 ### 7. API pública pequena
 
 Não criar endpoints genéricos de consulta ou execução.
+
+O coletor só pode ser acionado pela rota interna autenticada com Bearer secret. Falhas de autenticação são recusadas antes de carregar configuração TSE/cache ou iniciar qualquer fetch.
 
 ### 8. Cache
 

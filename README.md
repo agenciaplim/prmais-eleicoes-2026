@@ -22,6 +22,14 @@ O projeto inicia com `CACHE_DRIVER=memory`, portanto **não é necessário criar
 
 O acesso remoto ao TSE permanece desligado no ambiente local. Para habilitá-lo explicitamente, use `TSE_ENV=remote` e configure um dos pares de base/ambiente documentados em `docs/TSE_SCHEMAS.md`; o código não aceita origens fora da allowlist oficial.
 
+O coletor é acionado separadamente da API pública. Com `COLLECTOR_SECRET` configurado, uma execução manual pode ser feita com:
+
+```bash
+curl -X POST -H "Authorization: Bearer $COLLECTOR_SECRET" http://localhost:3000/api/internal/collect
+```
+
+A resposta informa quais resultados foram promovidos, permaneceram inalterados ou falharam, sem incluir payloads externos ou segredos.
+
 Quando o Upstash estiver configurado, altere:
 
 ```env

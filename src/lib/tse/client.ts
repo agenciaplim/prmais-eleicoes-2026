@@ -476,3 +476,5 @@ export function createTseClient(config: TseClientConfig, fetchImplementation: Fe
 
   return { buildUrl, fetchPayload };
 }
+
+export type TseClient = ReturnType<typeof createTseClient>;
