@@ -87,3 +87,13 @@ A identidade visual utilizada será a do PR+.
 **Decisão:** o fallback local copia valores na escrita e leitura, valida TTL e mantém estado isolado por instância.
 
 **Motivo:** evitar diferenças de comportamento que permitam mutar por referência um snapshot que, em produção, atravessaria uma fronteira de serialização no Redis.
+
+---
+
+## 2026-09-28 — Catálogo de localidades pelo EA12 estadual
+
+**Decisão:** normalizar o EA12 da eleição estadual em um catálogo versionado de UFs e municípios, excluindo a abrangência `zz` de localidades no exterior.
+
+**Motivo:** o arquivo estadual observado no simulado contém as 27 UFs e 5.571 municípios brasileiros; ele atende a busca dos 399 municípios do Paraná sem misturar localidades estrangeiras ao índice de estados.
+
+**API:** `/api/locations` publica apenas o índice leve de UFs; `/api/locations?state=<uf>` publica os municípios de uma UF por vez.

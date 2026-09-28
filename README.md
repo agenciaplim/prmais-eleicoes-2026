@@ -28,7 +28,7 @@ O coletor é acionado separadamente da API pública. Com `COLLECTOR_SECRET` conf
 curl -X POST -H "Authorization: Bearer $COLLECTOR_SECRET" http://localhost:3000/api/internal/collect
 ```
 
-A resposta informa quais resultados foram promovidos, permaneceram inalterados ou falharam, sem incluir payloads externos ou segredos.
+A resposta informa quais resultados e catálogo foram promovidos, permaneceram inalterados ou falharam, sem incluir payloads externos ou segredos.
 
 Os resultados públicos são lidos somente do cache. Sem parâmetros, a API retorna Presidente no Brasil. As combinações disponíveis são:
 
@@ -43,6 +43,15 @@ Os resultados públicos são lidos somente do cache. Sem parâmetros, a API reto
 ```
 
 Em desenvolvimento, apenas a consulta padrão usa dados mock quando o coletor ainda não produziu um snapshot. As demais consultas retornam `503` até que seus dados estejam no cache.
+
+O catálogo de localidades também é cache-only. A consulta sem parâmetros retorna o índice de estados; uma UF selecionada retorna seus municípios, códigos TSE/IBGE, zonas e indicação de capital:
+
+```text
+/api/locations
+/api/locations?state=pr
+```
+
+O parâmetro `state` aceita uma única sigla minúscula. UFs ausentes no catálogo retornam `404`, e o catálogo ainda não coletado retorna `503`.
 
 Quando o Upstash estiver configurado, altere:
 

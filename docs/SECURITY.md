@@ -62,6 +62,8 @@ Evitar `dangerouslySetInnerHTML`.
 
 Não criar endpoints genéricos de consulta ou execução.
 
+As APIs públicas aceitam apenas combinações de cargo/abrangência predefinidas ou uma única sigla de UF validada. Parâmetros desconhecidos, repetidos ou incompletos são recusados antes da leitura do cache.
+
 O coletor só pode ser acionado pela rota interna autenticada com Bearer secret. Falhas de autenticação são recusadas antes de carregar configuração TSE/cache ou iniciar qualquer fetch.
 
 ### 8. Cache

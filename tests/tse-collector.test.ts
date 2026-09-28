@@ -11,8 +11,9 @@ import {
   TseCollectorError
 } from "../src/lib/tse/collector";
 import { readLastKnownGood } from "../src/lib/tse/last-known-good";
+import { readLocationCatalog } from "../src/lib/tse/location-catalog";
 import { parseTseJson } from "../src/lib/tse/parser";
-import type { Ea11Payload, Ea20Payload } from "../src/lib/tse/schemas";
+import type { Ea11Payload, Ea12Payload, Ea20Payload } from "../src/lib/tse/schemas";
 
 async function fixture(name: string): Promise<string> {
   const url = new URL(`./fixtures/tse/${name}`, import.meta.url);
@@ -21,6 +22,7 @@ async function fixture(name: string): Promise<string> {
 
 async function collectorPayloads() {
   const ea11 = parseTseJson("EA11", await fixture("ea11-election-config.json"));
+  const ea12 = parseTseJson("EA12", await fixture("ea12-pr-municipalities.json"));
   const president = parseTseJson("EA20", await fixture("ea20-president-br.json"));
   const deputy = parseTseJson("EA20", await fixture("ea20-deputy-federal-pr.json"));
 
@@ -52,14 +54,16 @@ async function collectorPayloads() {
     ["7:state", proportional("7", "1012")]
   ]);
 
-  return { ea11, payloadByTarget };
+  return { ea11, ea12, payloadByTarget };
 }
 
 function fakeClient(
   ea11: Ea11Payload,
+  ea12: Ea12Payload,
   payloadByTarget: Map<string, Ea20Payload>,
   failOffice?: string,
-  requests: TseFileRequest[] = []
+  requests: TseFileRequest[] = [],
+  failCatalog = false
 ): TseClient {
   return {
     buildUrl() {
@@ -68,6 +72,10 @@ function fakeClient(
     async fetchPayload(request: TseFileRequest) {
       requests.push(request);
       if (request.kind === "EA11") return ea11;
+      if (request.kind === "EA12") {
+        if (failCatalog) throw new TseFetchError("TIMEOUT", "simulated catalog timeout");
+        return ea12;
+      }
       if (request.kind !== "EA20") throw new Error("unexpected request kind");
       if (request.officeCode === failOffice) throw new TseFetchError("TIMEOUT", "simulated timeout");
       const payload = payloadByTarget.get(`${request.officeCode}:${request.scope.type}`);
@@ -109,13 +117,14 @@ test("requires an event ID when more than one EA11 event matches", async () => {
 });
 
 test("collects and promotes all six first-round aggregate targets", async () => {
-  const { ea11, payloadByTarget } = await collectorPayloads();
+  const { ea11, ea12, payloadByTarget } = await collectorPayloads();
   const cache = createMemoryCache();
   const requests: TseFileRequest[] = [];
-  const client = fakeClient(ea11, payloadByTarget, undefined, requests);
+  const client = fakeClient(ea11, ea12, payloadByTarget, undefined, requests);
 
   const report = await collectElectionResults({ client, cache, config: { uf: "pr", round: "1" } });
 
+  assert.equal(report.catalog.status, "promoted");
   assert.equal(report.items.length, 6);
   assert.equal(report.items.every((item) => item.status === "promoted"), true);
   assert.deepEqual(
@@ -130,21 +139,39 @@ test("collects and promotes all six first-round aggregate targets", async () => 
     await readLastKnownGood(cache, { scope: "PR", scopeType: "state", office: "state-deputy" }),
     null
   );
+  assert.equal((await readLocationCatalog(cache))?.data.states[0]?.municipalities.length, 3);
+  assert.deepEqual(
+    requests.find((request) => request.kind === "EA12"),
+    { kind: "EA12", cycle: "ele2026", electionId: "21272" }
+  );
 
   const repeated = await collectElectionResults({ client, cache, config: { uf: "pr", round: "1" } });
+  assert.equal(repeated.catalog.status, "unchanged");
   assert.equal(repeated.items.every((item) => item.status === "unchanged"), true);
 });
 
 test("isolates one target failure and promotes the remaining results", async () => {
-  const { ea11, payloadByTarget } = await collectorPayloads();
+  const { ea11, ea12, payloadByTarget } = await collectorPayloads();
   const cache = createMemoryCache();
-  const client = fakeClient(ea11, payloadByTarget, "5");
+  const client = fakeClient(ea11, ea12, payloadByTarget, "5");
 
   const report = await collectElectionResults({ client, cache, config: { uf: "pr", round: "1" } });
   const senator = report.items.find((item) => item.office === "senator");
 
   assert.deepEqual(senator, { office: "senator", scope: "PR", status: "failed", errorCode: "fetch:TIMEOUT" });
   assert.equal(report.items.filter((item) => item.status === "promoted").length, 5);
+});
+
+test("isolates a catalog failure and still promotes election results", async () => {
+  const { ea11, ea12, payloadByTarget } = await collectorPayloads();
+  const cache = createMemoryCache();
+  const client = fakeClient(ea11, ea12, payloadByTarget, undefined, [], true);
+
+  const report = await collectElectionResults({ client, cache, config: { uf: "pr", round: "1" } });
+
+  assert.deepEqual(report.catalog, { status: "failed", errorCode: "fetch:TIMEOUT" });
+  assert.equal(report.items.every((item) => item.status === "promoted"), true);
+  assert.equal(await readLocationCatalog(cache), null);
 });
 
 test("validates collector environment settings", () => {

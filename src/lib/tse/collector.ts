@@ -9,9 +9,10 @@ import {
   type TseFileRequest
 } from "./client";
 import { promoteLastKnownGood } from "./last-known-good";
+import { normalizeEa12Catalog, promoteLocationCatalog } from "./location-catalog";
 import { normalizeEa20, TseNormalizationError } from "./normalizer";
 import { TsePayloadError } from "./parser";
-import type { Ea11Payload, Ea20Payload } from "./schemas";
+import type { Ea11Payload, Ea12Payload, Ea20Payload } from "./schemas";
 import type { ElectionOffice } from "./types";
 
 const requiredFirstRoundStateOffices = ["3", "5", "6", "7"] as const;
@@ -42,6 +43,11 @@ export type CollectionReport = {
   startedAt: string;
   finishedAt: string;
   discovery: DiscoveredElections;
+  catalog: {
+    status: "promoted" | "unchanged" | "failed";
+    sourceId?: string;
+    errorCode?: string;
+  };
   items: CollectionItem[];
 };
 
@@ -193,6 +199,23 @@ export async function collectElectionResults(options: {
   const ea11 = await options.client.fetchPayload({ kind: "EA11" });
   const discovery = discoverElections(ea11, options.config);
   const items: CollectionItem[] = [];
+  let catalog: CollectionReport["catalog"];
+
+  try {
+    const payload = (await options.client.fetchPayload({
+      kind: "EA12",
+      cycle: discovery.cycle,
+      electionId: discovery.stateElectionId
+    })) as Ea12Payload;
+    const normalized = normalizeEa12Catalog(payload, discovery.stateElectionId);
+    const promotion = await promoteLocationCatalog(options.cache, normalized, now);
+    catalog = {
+      status: promotion.promoted ? "promoted" : "unchanged",
+      sourceId: promotion.snapshot.data.sourceId
+    };
+  } catch (error) {
+    catalog = { status: "failed", errorCode: errorCode(error) };
+  }
 
   for (const target of collectionTargets(discovery, options.config.uf)) {
     try {
@@ -222,7 +245,7 @@ export async function collectElectionResults(options: {
     }
   }
 
-  return { startedAt, finishedAt: now().toISOString(), discovery, items };
+  return { startedAt, finishedAt: now().toISOString(), discovery, catalog, items };
 }
 
 export function collectorConfigFromEnv(env: Readonly<Record<string, string | undefined>> = process.env): CollectorConfig {

@@ -20,12 +20,12 @@
 - modo JWS obrigatório verifica EdDSA/Ed25519, `kid` e assinatura com as chaves públicas oficiais de cada ambiente.
 - adaptador Upstash Redis disponível com configuração validada e cache em memória isolado e restrito ao desenvolvimento.
 - coletor server-side descobre eleições pelo EA11 e promove seis resultados agregados, acionado apenas por rota interna autenticada.
+- catálogo EA12 versionado armazena as 27 UFs e seus municípios e é exposto por `/api/locations` sem fetch público.
 
 ## Em desenvolvimento
 
-- integração da coleta TSE com cache e API;
-- conexão com Upstash Redis;
 - interface completa conforme wireframe e identidade PR+.
+- provisionamento do Upstash Redis e da hospedagem de produção.
 
 ## Dependências externas ainda não necessárias
 
@@ -36,11 +36,7 @@
 
 ## Próxima prioridade
 
-Implementar o fluxo:
-
-`TSE -> validação -> normalização -> cache -> API -> interface`
-
-coletar e expor o catálogo de municípios e estados (API-002).
+Aplicar a identidade visual real do PR+ na interface (WEB-001), consumindo somente as APIs internas já preparadas.
 
 ## Handoff TSE-001
 
@@ -138,3 +134,11 @@ coletar e expor o catálogo de municípios e estados (API-002).
 - segurança: parâmetros desconhecidos, repetidos, incompletos ou combinações fora da matriz pública retornam `400`; ausência de snapshot retorna `503` sem cache;
 - validação: 62 testes, typecheck e build passam; o parser cobre todas as combinações permitidas e rejeições antes da leitura do cache;
 - falta: coletar, armazenar e expor o catálogo de localidades do EA12 (API-002).
+
+## Handoff API-002
+
+- feito: o coletor busca um EA12 estadual por ciclo, normaliza UFs/municípios e promove um catálogo last-known-good versionado sem TTL;
+- API: `/api/locations` retorna o índice leve de estados e `?state=<uf>` retorna um estado com seus municípios, códigos TSE/IBGE, zonas e capital;
+- resiliência: falha do catálogo é isolada no relatório e não impede a promoção dos resultados eleitorais; a rota pública nunca consulta o TSE;
+- validação: 68 testes, typecheck e build passam; a prova assinada no simulado normalizou 27 UFs, 5.571 municípios e os 399 municípios do Paraná;
+- falta: aplicar a identidade visual do PR+ e conectar a interface às APIs internas.
