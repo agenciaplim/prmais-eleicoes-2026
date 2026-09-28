@@ -18,6 +18,7 @@
 - cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload;
 - snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática;
 - modo JWS obrigatório verifica EdDSA/Ed25519, `kid` e assinatura com as chaves públicas oficiais de cada ambiente.
+- adaptador Upstash Redis disponível com configuração validada e cache em memória restrito ao desenvolvimento.
 
 ## Em desenvolvimento
 
@@ -38,7 +39,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-integrar o coletor validado ao Upstash e ao agendamento server-side, começando por CACHE-001.
+validar o fallback local em memória (CACHE-002) e então integrar o coletor ao cache.
 
 ## Handoff TSE-001
 
@@ -103,3 +104,11 @@ integrar o coletor validado ao Upstash e ao agendamento server-side, começando 
 - limite: esta é a verificação JWK simplificada indicada pelo manual; cadeia X.509 e consulta de LCR não foram implementadas;
 - risco: conferir eventual rotação das chaves no manual oficial antes da eleição;
 - falta: integrar Upstash e criar o agendamento/coletor server-side que chama fetch, normalização e promoção.
+
+## Handoff CACHE-001
+
+- feito: resolução explícita do driver, adaptador `CacheStore` para Upstash REST e instanciação com URL/token validados;
+- produção: exige `CACHE_DRIVER=upstash` e rejeita cache em memória, driver desconhecido, credenciais ausentes e endpoint fora de `*.upstash.io`;
+- segurança: erros de configuração não incluem o token;
+- validação: testes cobrem configuração e mapeamento de `get`/`set`, com e sem TTL;
+- falta: completar os testes de expiração/isolamento do fallback em memória e conectar o coletor.

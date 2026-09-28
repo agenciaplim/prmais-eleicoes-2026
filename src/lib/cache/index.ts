@@ -1,21 +1,20 @@
+import { cacheConfigFromEnv } from "./config";
 import { memoryCache } from "./memory";
 import type { CacheStore } from "./types";
+import { createUpstashCache } from "./upstash";
 
 export async function getCache(): Promise<CacheStore> {
-  const driver = process.env.CACHE_DRIVER ?? "memory";
+  const config = cacheConfigFromEnv();
 
-  if (driver === "upstash") {
+  if (config.driver === "upstash") {
     const { Redis } = await import("@upstash/redis");
-    const redis = Redis.fromEnv();
-    return {
-      get: <T>(key: string) => redis.get<T>(key),
-      async set(key: string, value: unknown, ttlSeconds?: number): Promise<void> {
-        await redis.set(key, value, ttlSeconds ? { ex: ttlSeconds } : undefined);
-      }
-    };
+    return createUpstashCache(new Redis({ url: config.url, token: config.token }));
   }
 
   return memoryCache;
 }
 
+export { CacheConfigError, cacheConfigFromEnv } from "./config";
+export { createMemoryCache } from "./memory";
+export { createUpstashCache } from "./upstash";
 export type { CacheStore } from "./types";

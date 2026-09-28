@@ -24,7 +24,7 @@ Legenda:
 
 ## Cache
 
-- [ ] CACHE-001 Integrar Upstash Redis
+- [x] CACHE-001 Integrar Upstash Redis — Codex (`codex/tse-schemas`)
 - [ ] CACHE-002 Manter fallback local em desenvolvimento
 
 ## Interface
