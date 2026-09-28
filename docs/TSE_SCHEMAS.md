@@ -13,6 +13,7 @@ Mapeamento dos arquivos oficiais necessários ao PR+ Eleições 2026.
 - [EA14 - Acompanhamento Brasil (10/06/2026)](https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea14-arquivo-de-acompanhamento-brasil)
 - [EA15 - Acompanhamento UF (10/06/2026)](https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea15-arquivo-de-acompanhamento-uf)
 - [EA20 - Resultado unificado (10/07/2026)](https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea20-arquivo-de-resultado-unificado)
+- [Manual de verificação dos arquivos JWS (16/09/2026)](https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/manual-verificacao-jws)
 
 Os PDFs vigentes são o contrato de referência. Os payloads do simulado foram usados apenas para confirmar serialização, campos condicionais e cardinalidade. O TSE pode publicar novas versões; conferir a página técnica antes de congelar os schemas de produção.
 
@@ -77,6 +78,16 @@ Regras de formato:
 - não transformar `arq[].dir` em proxy genérico nem aceitar tokens fora do conjunto documentado.
 
 O cliente usa timeout de 5 segundos e limite de 5 MiB por payload por padrão. O limite é verificado pelo `Content-Length`, quando presente, e novamente durante o streaming do corpo descomprimido. Redirects são recusados e a fase, eleição, UF, abrangência e cargo do payload são comparados com a requisição.
+
+## Assinaturas JWS
+
+O TSE publica cada arquivo em pares `.json` e `.jws`. O modo `required` troca a extensão para `.jws`, valida o JWS compacto com `jose` e só entrega o JSON interno ao parser após confirmar:
+
+- algoritmo protegido exatamente `EdDSA` com curva Ed25519;
+- `kid` correspondente à chave pública fixada para desenvolvimento/simulado ou oficial;
+- assinatura criptográfica sobre cabeçalho e payload.
+
+Não há fallback automático para o `.json` quando a assinatura falha. As JWKs públicas são as constantes publicadas no manual de 16/09/2026 e devem ser reconferidas antes da operação. A implementação usa a verificação JWK simplificada recomendada para código; não valida a cadeia X.509 nem consulta a Lista de Certificados Revogados, necessárias para garantia qualificada/auditoria formal.
 
 ## Convenções de tipos
 

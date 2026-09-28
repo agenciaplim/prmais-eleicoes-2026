@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { createTseClient, TseFetchError, type TseClientConfig } from "../src/lib/tse/client";
+import { CompactSign, exportJWK, generateKeyPair } from "jose";
+import {
+  createTseClient,
+  TseFetchError,
+  verifyCompactJws,
+  type TseClientConfig
+} from "../src/lib/tse/client";
 
 const simulationConfig: TseClientConfig = {
   baseUrl: "https://resultados-sim.tse.jus.br/simulado",
@@ -48,6 +54,14 @@ test("builds only documented TSE file URLs", () => {
       scope: { type: "municipality", uf: "PR", municipalityCode: "75353" }
     }).href,
     "https://resultados-sim.tse.jus.br/simulado/simulado2026/ele2026/21272/dados/pr/pr75353-c0005-e021272-u.json"
+  );
+});
+
+test("switches to the paired JWS file when signature verification is required", () => {
+  const client = createTseClient({ ...simulationConfig, jwsMode: "required" });
+  assert.equal(
+    client.buildUrl({ kind: "EA11" }).href,
+    "https://resultados-sim.tse.jus.br/simulado/simulado2026/comum/config/ele-c.jws"
   );
 });
 
@@ -175,5 +189,46 @@ test("keeps the timeout active while streaming the response", async () => {
   await assert.rejects(
     () => client.fetchPayload({ kind: "EA11" }),
     (error: unknown) => error instanceof TseFetchError && error.code === "TIMEOUT"
+  );
+});
+
+test("verifies an EdDSA compact JWS with the configured key identifier", async () => {
+  const { publicKey, privateKey } = await generateKeyPair("EdDSA");
+  const kid = "test-key";
+  const publicJwk = { ...(await exportJWK(publicKey)), alg: "EdDSA", kid };
+  const payload = await fixture("ea11-election-config.json");
+  const jws = await new CompactSign(new TextEncoder().encode(payload))
+    .setProtectedHeader({ alg: "EdDSA", kid, typ: "JOSE" })
+    .sign(privateKey);
+
+  assert.equal(await verifyCompactJws(jws, publicJwk), payload);
+});
+
+test("rejects a valid signature carrying an untrusted key identifier", async () => {
+  const { publicKey, privateKey } = await generateKeyPair("EdDSA");
+  const publicJwk = { ...(await exportJWK(publicKey)), alg: "EdDSA", kid: "trusted-key" };
+  const jws = await new CompactSign(new TextEncoder().encode("{}"))
+    .setProtectedHeader({ alg: "EdDSA", kid: "different-key" })
+    .sign(privateKey);
+
+  await assert.rejects(
+    () => verifyCompactJws(jws, publicJwk),
+    (error: unknown) => error instanceof TseFetchError && error.code === "INVALID_SIGNATURE"
+  );
+});
+
+test("rejects a tampered compact JWS", async () => {
+  const { publicKey, privateKey } = await generateKeyPair("EdDSA");
+  const kid = "test-key";
+  const publicJwk = { ...(await exportJWK(publicKey)), alg: "EdDSA", kid };
+  const jws = await new CompactSign(new TextEncoder().encode('{"ok":true}'))
+    .setProtectedHeader({ alg: "EdDSA", kid })
+    .sign(privateKey);
+  const [header, _payload, signature] = jws.split(".");
+  const tampered = `${header}.eyJvayI6ZmFsc2V9.${signature}`;
+
+  await assert.rejects(
+    () => verifyCompactJws(tampered, publicJwk),
+    (error: unknown) => error instanceof TseFetchError && error.code === "INVALID_SIGNATURE"
   );
 });

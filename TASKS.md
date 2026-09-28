@@ -20,7 +20,7 @@ Legenda:
 - [x] TSE-004 Implementar normalizador para modelo PR+ — Codex (`codex/tse-schemas`)
 - [x] TSE-005 Implementar fetch server-side com timeout e limite de payload — Codex (`codex/tse-schemas`)
 - [x] TSE-006 Implementar last-known-good — Codex (`codex/tse-schemas`)
-- [ ] TSE-007 Adicionar validação JWS quando aplicável
+- [x] TSE-007 Adicionar validação JWS quando aplicável — Codex (`codex/tse-schemas`)
 
 ## Cache
 

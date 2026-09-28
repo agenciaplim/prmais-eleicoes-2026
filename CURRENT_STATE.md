@@ -16,7 +16,8 @@
 - parser e schemas Zod para EA11, EA12, EA14, EA15 e EA20 implementados, incluindo validações aritméticas e de abrangência;
 - normalizador EA20 converte os cinco cargos do MVP para o modelo interno tipado do PR+;
 - cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload;
-- snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática.
+- snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática;
+- modo JWS obrigatório verifica EdDSA/Ed25519, `kid` e assinatura com as chaves públicas oficiais de cada ambiente.
 
 ## Em desenvolvimento
 
@@ -37,7 +38,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-continuando pela validação JWS dos arquivos que disponibilizarem assinatura (TSE-007).
+integrar o coletor validado ao Upstash e ao agendamento server-side, começando por CACHE-001.
 
 ## Handoff TSE-001
 
@@ -91,3 +92,14 @@ continuando pela validação JWS dos arquivos que disponibilizarem assinatura (T
 - validação: 33 testes, typecheck e build passam;
 - risco: a comparação de frescor usa leitura seguida de escrita e pressupõe o coletor único definido na arquitetura; múltiplos coletores exigiriam compare-and-set no Redis;
 - falta: validar assinaturas JWS quando disponibilizadas e criar o agendamento/coletor que promove resultados.
+
+## Handoff TSE-007
+
+- feito: consumo opcional de `.json` e modo `.jws` obrigatório sem fallback, integrado ao mesmo timeout e limite de payload;
+- criptografia: JWS compacto, algoritmo EdDSA/Ed25519, `kid` estrito e JWKs de desenvolvimento/oficial publicadas pelo TSE;
+- ordem: assinatura é verificada antes do parse Zod, da normalização e de qualquer promoção ao last-known-good;
+- configuração: `tseClientConfigFromEnv` usa `TSE_JWS_MODE=required` por padrão para acesso remoto;
+- validação: 37 testes, typecheck e build passam; EA11 e EA20 reais do simulado foram verificados com sucesso em modo JWS;
+- limite: esta é a verificação JWK simplificada indicada pelo manual; cadeia X.509 e consulta de LCR não foram implementadas;
+- risco: conferir eventual rotação das chaves no manual oficial antes da eleição;
+- falta: integrar Upstash e criar o agendamento/coletor server-side que chama fetch, normalização e promoção.

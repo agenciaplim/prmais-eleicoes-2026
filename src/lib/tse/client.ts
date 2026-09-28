@@ -1,3 +1,4 @@
+import { compactVerify, decodeProtectedHeader, importJWK, type JWK } from "jose";
 import { parseTseJson, type TsePayloadByKind, type TsePayloadKind } from "./parser";
 
 const DEFAULT_TIMEOUT_MS = 5_000;
@@ -9,6 +10,27 @@ const allowedSources = {
   "https://resultados.tse.jus.br": /^oficial$/,
   "https://resultados-sim.tse.jus.br/simulado": /^simulado\d{4}$/
 } as const;
+
+const trustedJwks = {
+  s: {
+    kty: "OKP",
+    use: "sig",
+    key_ops: ["verify"],
+    alg: "EdDSA",
+    kid: "pEGrlis0i8vO2Bz7Ergwr0MnKfg",
+    crv: "Ed25519",
+    x: "81fm_gXW6Q5gBWrGJkE7j5MOS5vmTnRqqFHfdMeRbsw"
+  },
+  o: {
+    kty: "OKP",
+    use: "sig",
+    key_ops: ["verify"],
+    alg: "EdDSA",
+    kid: "sNbt9Q_fLS65zE1_ZLNV-XRRwPY",
+    crv: "Ed25519",
+    x: "kWlpNHjuws1csyQZwzn3Fhzbi3RD435RbpThtSr4hMc"
+  }
+} as const satisfies Record<"s" | "o", JWK & { kid: string }>;
 
 type ElectionFileRequest = {
   cycle: string;
@@ -33,6 +55,7 @@ export type TseClientConfig = {
   environment: string;
   timeoutMs?: number;
   maxPayloadBytes?: number;
+  jwsMode?: "required" | "disabled";
 };
 
 export type TseFetchErrorCode =
@@ -44,6 +67,7 @@ export type TseFetchErrorCode =
   | "EMPTY_RESPONSE"
   | "NETWORK_ERROR"
   | "TIMEOUT"
+  | "INVALID_SIGNATURE"
   | "REQUEST_MISMATCH";
 
 export class TseFetchError extends Error {
@@ -66,6 +90,7 @@ type NormalizedConfig = {
   expectedPhase: "s" | "o";
   timeoutMs: number;
   maxPayloadBytes: number;
+  jwsMode: "required" | "disabled";
 };
 
 function invalidConfig(message: string): never {
@@ -103,6 +128,7 @@ function normalizeConfig(config: TseClientConfig): NormalizedConfig {
 
   const timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const maxPayloadBytes = config.maxPayloadBytes ?? DEFAULT_MAX_PAYLOAD_BYTES;
+  const jwsMode = config.jwsMode ?? "disabled";
 
   if (!Number.isInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > MAX_CONFIGURED_TIMEOUT_MS) {
     return invalidConfig(`TSE timeout must be between 1 and ${MAX_CONFIGURED_TIMEOUT_MS} milliseconds`);
@@ -112,12 +138,17 @@ function normalizeConfig(config: TseClientConfig): NormalizedConfig {
     return invalidConfig(`TSE payload limit must be between 1 and ${MAX_CONFIGURED_PAYLOAD_BYTES} bytes`);
   }
 
+  if (jwsMode !== "required" && jwsMode !== "disabled") {
+    return invalidConfig("TSE JWS mode must be required or disabled");
+  }
+
   return {
     baseUrl,
     environment: config.environment,
     expectedPhase: config.environment === "oficial" ? "o" : "s",
     timeoutMs,
-    maxPayloadBytes
+    maxPayloadBytes,
+    jwsMode
   };
 }
 
@@ -303,6 +334,36 @@ async function readLimitedBody(response: Response, maxPayloadBytes: number): Pro
   }
 }
 
+async function verifyWithKey(jws: string, jwk: JWK & { kid: string }, key: CryptoKey): Promise<string> {
+  let header: ReturnType<typeof decodeProtectedHeader>;
+  try {
+    header = decodeProtectedHeader(jws);
+  } catch {
+    throw new TseFetchError("INVALID_SIGNATURE", "TSE JWS has an invalid protected header");
+  }
+
+  if (header.alg !== "EdDSA" || header.kid !== jwk.kid) {
+    throw new TseFetchError("INVALID_SIGNATURE", "TSE JWS algorithm or key identifier is not trusted");
+  }
+
+  try {
+    const verified = await compactVerify(jws, key, { algorithms: ["EdDSA"] });
+    return new TextDecoder("utf-8", { fatal: true }).decode(verified.payload);
+  } catch {
+    throw new TseFetchError("INVALID_SIGNATURE", "TSE JWS signature verification failed");
+  }
+}
+
+export async function verifyCompactJws(jws: string, jwk: JWK & { kid: string }): Promise<string> {
+  let key: CryptoKey;
+  try {
+    key = (await importJWK(jwk, "EdDSA")) as CryptoKey;
+  } catch {
+    throw new TseFetchError("INVALID_CONFIG", "TSE JWS public key is invalid");
+  }
+  return verifyWithKey(jws.trim(), jwk, key);
+}
+
 function envInteger(name: string, fallback: number, maximum: number): number {
   const raw = process.env[name];
   if (raw === undefined || raw === "") return fallback;
@@ -324,6 +385,11 @@ export function tseClientConfigFromEnv(): TseClientConfig {
     return invalidConfig("TSE_BASE_URL and TSE_RESULTS_ENV are required for remote access");
   }
 
+  const jwsMode = process.env.TSE_JWS_MODE ?? "required";
+  if (jwsMode !== "required" && jwsMode !== "disabled") {
+    return invalidConfig("TSE_JWS_MODE must be required or disabled");
+  }
+
   return {
     baseUrl,
     environment,
@@ -332,7 +398,8 @@ export function tseClientConfigFromEnv(): TseClientConfig {
       "TSE_MAX_PAYLOAD_BYTES",
       DEFAULT_MAX_PAYLOAD_BYTES,
       MAX_CONFIGURED_PAYLOAD_BYTES
-    )
+    ),
+    jwsMode
   };
 }
 
@@ -342,9 +409,17 @@ export function createTseClient(config: TseClientConfig, fetchImplementation: Fe
   }
 
   const normalizedConfig = normalizeConfig(config);
+  const trustedJwk = trustedJwks[normalizedConfig.expectedPhase];
+  const verificationKey =
+    normalizedConfig.jwsMode === "required"
+      ? importJWK(trustedJwk, "EdDSA").catch(() => {
+          throw new TseFetchError("INVALID_CONFIG", "TSE JWS public key is invalid");
+        })
+      : null;
 
   function buildUrl(request: TseFileRequest): URL {
-    const path = buildPath(request);
+    const jsonPath = buildPath(request);
+    const path = normalizedConfig.jwsMode === "required" ? jsonPath.replace(/\.json$/, ".jws") : jsonPath;
     return new URL(`${normalizedConfig.baseUrl}/${normalizedConfig.environment}/${path}`);
   }
 
@@ -391,7 +466,10 @@ export function createTseClient(config: TseClientConfig, fetchImplementation: Fe
       throw new TseFetchError("NETWORK_ERROR", "TSE response could not be read");
     }
 
-    const payload = parseTseJson(request.kind, json);
+    const verifiedJson = verificationKey
+      ? await verifyWithKey(json.trim(), trustedJwk, (await verificationKey) as CryptoKey)
+      : json;
+    const payload = parseTseJson(request.kind, verifiedJson);
     assertPayloadMatchesRequest(request, payload, normalizedConfig.expectedPhase);
     return payload;
   }

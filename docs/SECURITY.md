@@ -23,6 +23,7 @@ fetch
 -> verificar status HTTP
 -> limitar tamanho
 -> validar tipo esperado
+-> verificar assinatura JWS quando exigida
 -> parse
 -> validar schema
 -> validar campos semânticos
@@ -37,6 +38,8 @@ Falha de rede, schema ou assinatura nunca limpa os resultados atuais.
 A aplicação mantém o último snapshot válido e informa sua data/hora.
 
 Snapshots eleitorais são revalidados no modelo interno antes da promoção, armazenados em envelope versionado sem TTL e não podem regredir de fase oficial para simulada nem para uma totalização mais antiga. Em produção, ausência ou corrupção do snapshot resulta em `503`, nunca em mock silencioso.
+
+Falha de assinatura JWS encerra a coleta e não aciona fallback para o arquivo JSON sem assinatura.
 
 ### 5. Secrets
 

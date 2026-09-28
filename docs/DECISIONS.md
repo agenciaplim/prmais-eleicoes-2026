@@ -69,3 +69,13 @@ A identidade visual utilizada será a do PR+.
 **Decisão:** armazenar resultados normalizados em envelope versionado, sem TTL, e promover somente snapshots válidos que não representem regressão de fase ou totalização.
 
 **Motivo:** falhas temporárias do TSE, do coletor ou do cache não podem retirar do ar o último resultado eleitoral confiável.
+
+---
+
+## 2026-09-28 — Verificação JWS por JWK
+
+**Decisão:** usar `jose` para verificar os arquivos JWS compactos com EdDSA/Ed25519 e as JWKs públicas fixadas no manual do TSE, sem fallback para JSON quando o modo for obrigatório.
+
+**Motivo:** é o fluxo recomendado pelo TSE para verificação em código e garante integridade/autenticidade antes do parser e do cache.
+
+**Limite:** cadeia X.509 e consulta de LCR ficam fora do MVP; devem ser adicionadas se houver requisito formal de auditoria ou conformidade.
