@@ -30,6 +30,20 @@ curl -X POST -H "Authorization: Bearer $COLLECTOR_SECRET" http://localhost:3000/
 
 A resposta informa quais resultados foram promovidos, permaneceram inalterados ou falharam, sem incluir payloads externos ou segredos.
 
+Os resultados públicos são lidos somente do cache. Sem parâmetros, a API retorna Presidente no Brasil. As combinações disponíveis são:
+
+```text
+/api/results
+/api/results?office=president&scope=br
+/api/results?office=president&scope=pr
+/api/results?office=governor&scope=pr
+/api/results?office=senator&scope=pr
+/api/results?office=federal-deputy&scope=pr
+/api/results?office=state-deputy&scope=pr
+```
+
+Em desenvolvimento, apenas a consulta padrão usa dados mock quando o coletor ainda não produziu um snapshot. As demais consultas retornam `503` até que seus dados estejam no cache.
+
 Quando o Upstash estiver configurado, altere:
 
 ```env

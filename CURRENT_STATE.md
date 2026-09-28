@@ -7,7 +7,7 @@
 - estrutura inicial do repositório criada;
 - aplicação Next.js preparada para desenvolvimento local;
 - cache em memória disponível para desenvolvimento;
-- endpoint inicial `/api/results` criado;
+- endpoint `/api/results` expõe do cache as seis combinações agregadas do MVP com allowlist estrita;
 - documentação compartilhada para Codex e Cloud Code criada;
 - wireframe de referência incluído na documentação;
 - schemas oficiais EA11, EA12, EA14, EA15 e EA20 mapeados em `docs/TSE_SCHEMAS.md`;
@@ -40,7 +40,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-expor os resultados promovidos por cargo e abrangência na API cache-only (API-001).
+coletar e expor o catálogo de municípios e estados (API-002).
 
 ## Handoff TSE-001
 
@@ -130,3 +130,11 @@ expor os resultados promovidos por cargo e abrangência na API cache-only (API-0
 - acionamento: `GET`/`POST /api/internal/collect` exige Bearer `COLLECTOR_SECRET` com pelo menos 32 caracteres e nunca é chamado pela API pública;
 - validação: 51 testes, typecheck e build passam; a prova online promoveu os seis resultados usando sete arquivos JWS reais do simulado;
 - falta: ampliar `/api/results` para selecionar identidades permitidas no cache e depois adicionar o catálogo de localidades.
+
+## Handoff API-001
+
+- feito: `/api/results` seleciona Presidente BR/PR, Governador PR, Senador PR, Deputado Federal PR e Deputado Estadual PR exclusivamente no cache;
+- compatibilidade: a rota sem parâmetros continua retornando Presidente BR e mantém o mock apenas nessa consulta durante o desenvolvimento;
+- segurança: parâmetros desconhecidos, repetidos, incompletos ou combinações fora da matriz pública retornam `400`; ausência de snapshot retorna `503` sem cache;
+- validação: 62 testes, typecheck e build passam; o parser cobre todas as combinações permitidas e rejeições antes da leitura do cache;
+- falta: coletar, armazenar e expor o catálogo de localidades do EA12 (API-002).

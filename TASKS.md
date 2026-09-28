@@ -30,7 +30,7 @@ Legenda:
 
 ## API
 
-- [ ] API-001 Expor resultados por cargo e abrangência a partir do cache
+- [x] API-001 Expor resultados por cargo e abrangência a partir do cache — Codex (`codex/tse-schemas`)
 - [ ] API-002 Expor catálogo de municípios e estados
 
 ## Interface
