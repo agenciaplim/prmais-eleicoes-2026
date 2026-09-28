@@ -1,4 +1,5 @@
 import type { CacheStore } from "./types";
+import { validateTtl } from "./ttl";
 
 type Entry = { value: unknown; expiresAt?: number };
 
@@ -9,16 +10,17 @@ export function createMemoryCache(now: () => number = Date.now): CacheStore {
     async get<T>(key: string): Promise<T | null> {
       const entry = store.get(key);
       if (!entry) return null;
-      if (entry.expiresAt && entry.expiresAt < now()) {
+      if (entry.expiresAt !== undefined && entry.expiresAt <= now()) {
         store.delete(key);
         return null;
       }
-      return entry.value as T;
+      return structuredClone(entry.value) as T;
     },
     async set(key: string, value: unknown, ttlSeconds?: number): Promise<void> {
+      validateTtl(ttlSeconds);
       store.set(key, {
-        value,
-        expiresAt: ttlSeconds ? now() + ttlSeconds * 1000 : undefined
+        value: structuredClone(value),
+        expiresAt: ttlSeconds === undefined ? undefined : now() + ttlSeconds * 1000
       });
     }
   };

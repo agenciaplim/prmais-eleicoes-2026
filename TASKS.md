@@ -21,11 +21,12 @@ Legenda:
 - [x] TSE-005 Implementar fetch server-side com timeout e limite de payload — Codex (`codex/tse-schemas`)
 - [x] TSE-006 Implementar last-known-good — Codex (`codex/tse-schemas`)
 - [x] TSE-007 Adicionar validação JWS quando aplicável — Codex (`codex/tse-schemas`)
+- [ ] TSE-008 Orquestrar descoberta e coleta server-side
 
 ## Cache
 
 - [x] CACHE-001 Integrar Upstash Redis — Codex (`codex/tse-schemas`)
-- [ ] CACHE-002 Manter fallback local em desenvolvimento
+- [x] CACHE-002 Manter fallback local em desenvolvimento — Codex (`codex/tse-schemas`)
 
 ## Interface
 

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { CacheConfigError, cacheConfigFromEnv, createUpstashCache } from "../src/lib/cache";
+import { CacheConfigError, cacheConfigFromEnv, createMemoryCache, createUpstashCache } from "../src/lib/cache";
 
 test("uses memory cache by default outside production", () => {
   assert.deepEqual(cacheConfigFromEnv({}, "development"), { driver: "memory" });
@@ -65,4 +65,51 @@ test("maps CacheStore operations to the Upstash REST client", async () => {
     ["persistent", { ok: true }, undefined],
     ["temporary", "value", { ex: 60 }]
   ]);
+});
+
+test("keeps memory cache instances isolated", async () => {
+  const first = createMemoryCache();
+  const second = createMemoryCache();
+  await first.set("key", "first");
+
+  assert.equal(await first.get("key"), "first");
+  assert.equal(await second.get("key"), null);
+});
+
+test("expires memory entries exactly at their TTL", async () => {
+  let now = 1_000;
+  const cache = createMemoryCache(() => now);
+  await cache.set("key", "value", 2);
+
+  now = 2_999;
+  assert.equal(await cache.get("key"), "value");
+  now = 3_000;
+  assert.equal(await cache.get("key"), null);
+});
+
+test("copies values across the memory cache boundary", async () => {
+  const cache = createMemoryCache();
+  const original = { nested: { value: 1 } };
+  await cache.set("key", original);
+  original.nested.value = 2;
+
+  const firstRead = await cache.get<typeof original>("key");
+  assert.equal(firstRead?.nested.value, 1);
+  firstRead!.nested.value = 3;
+  assert.equal((await cache.get<typeof original>("key"))?.nested.value, 1);
+});
+
+test("rejects invalid TTLs consistently", async () => {
+  const memory = createMemoryCache();
+  const upstash = createUpstashCache({
+    async get() {
+      return null;
+    },
+    async set() {
+      return "OK";
+    }
+  });
+
+  await assert.rejects(() => memory.set("key", "value", 0), RangeError);
+  await assert.rejects(() => upstash.set("key", "value", 1.5), RangeError);
 });

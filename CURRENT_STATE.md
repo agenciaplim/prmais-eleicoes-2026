@@ -18,7 +18,7 @@
 - cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload;
 - snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática;
 - modo JWS obrigatório verifica EdDSA/Ed25519, `kid` e assinatura com as chaves públicas oficiais de cada ambiente.
-- adaptador Upstash Redis disponível com configuração validada e cache em memória restrito ao desenvolvimento.
+- adaptador Upstash Redis disponível com configuração validada e cache em memória isolado e restrito ao desenvolvimento.
 
 ## Em desenvolvimento
 
@@ -39,7 +39,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-validar o fallback local em memória (CACHE-002) e então integrar o coletor ao cache.
+orquestrar descoberta, coleta, normalização e promoção server-side (TSE-008).
 
 ## Handoff TSE-001
 
@@ -112,3 +112,11 @@ validar o fallback local em memória (CACHE-002) e então integrar o coletor ao 
 - segurança: erros de configuração não incluem o token;
 - validação: testes cobrem configuração e mapeamento de `get`/`set`, com e sem TTL;
 - falta: completar os testes de expiração/isolamento do fallback em memória e conectar o coletor.
+
+## Handoff CACHE-002
+
+- feito: fallback em memória com instâncias isoladas, cópia estruturada na escrita/leitura e expiração determinística;
+- consistência: cache local e Upstash rejeitam TTL ausente de integridade, zero, negativo ou fracionário;
+- segurança: mutações no objeto original ou retornado não alteram o snapshot armazenado;
+- validação: 45 testes e typecheck passam;
+- falta: implementar o coletor server-side que usa o cache selecionado pelo ambiente.

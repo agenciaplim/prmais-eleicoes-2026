@@ -79,3 +79,11 @@ A identidade visual utilizada será a do PR+.
 **Motivo:** é o fluxo recomendado pelo TSE para verificação em código e garante integridade/autenticidade antes do parser e do cache.
 
 **Limite:** cadeia X.509 e consulta de LCR ficam fora do MVP; devem ser adicionadas se houver requisito formal de auditoria ou conformidade.
+
+---
+
+## 2026-09-28 — Cache em memória compatível com Redis
+
+**Decisão:** o fallback local copia valores na escrita e leitura, valida TTL e mantém estado isolado por instância.
+
+**Motivo:** evitar diferenças de comportamento que permitam mutar por referência um snapshot que, em produção, atravessaria uma fronteira de serialização no Redis.
