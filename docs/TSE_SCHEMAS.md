@@ -134,12 +134,12 @@ raiz { dg, hg, idg, f }
 | --- | --- |
 | `abr[].cd` | UF em minúsculas ou `zz` |
 | `mu[].cd` | código TSE com exatamente 5 dígitos |
-| `mu[].cdi` | código IBGE; validar 7 dígitos no payload de 2026 |
+| `mu[].cdi` | código IBGE; 7 dígitos para municípios brasileiros e vazio para localidades de `zz` |
 | `mu[].nm` | nome do município/localidade |
 | `mu[].c` | capital: `s` ou `n` |
 | `mu[].z[]` | zonas com exatamente 4 dígitos |
 
-Divergência oficial observada: o PDF EA12 descreve `cdi` como código IBGE de 5 dígitos, mas o simulado publicou códigos IBGE de 7 dígitos, como `4100103`. A fixture e o schema devem seguir o payload oficial observado e manter um teste que documente essa diferença.
+Divergência oficial observada: o PDF EA12 descreve `cdi` como código IBGE de 5 dígitos, mas o simulado publicou códigos IBGE de 7 dígitos, como `4100103`, para municípios brasileiros e string vazia para localidades do exterior. A fixture e o schema devem seguir o payload oficial observado e manter um teste que documente essa diferença.
 
 No simulado, a abrangência `pr` continha exatamente 399 municípios.
 
@@ -160,7 +160,7 @@ raiz { ele, t, f, dg, hg, idg }
 `tpabr` aceita `br` ou `uf`; `cdabr` deve ser coerente com o tipo. Os grupos condicionais são:
 
 - Brasil: `ufsnr`, `ufspt`, `ufsf` e seus percentuais;
-- Brasil e/ou UF conforme o registro: `munnr`, `munpt`, `munf` e seus percentuais;
+- UF e, quando publicados, Brasil: `munnr`, `munpt`, `munf` e seus percentuais;
 - todos os registros: `s` e `e`.
 
 O EA14 serve para detectar quais UFs mudaram e direcionar a leitura dos EA20. `dt`/`ht` indicam a última totalização da abrangência, mas podem ficar temporariamente à frente do EA20 por causa da sincronização paralela da CDN.

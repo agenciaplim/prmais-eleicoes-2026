@@ -16,7 +16,7 @@ Legenda:
 
 - [x] TSE-001 Mapear schemas oficiais necessários (EA11, EA12, EA14, EA15, EA20) — Codex (`codex/tse-schemas`)
 - [x] TSE-002 Criar fixtures locais representativas — Codex (`codex/tse-schemas`)
-- [ ] TSE-003 Implementar parser e validação Zod
+- [x] TSE-003 Implementar parser e validação Zod — Codex (`codex/tse-schemas`)
 - [ ] TSE-004 Implementar normalizador para modelo PR+
 - [ ] TSE-005 Implementar fetch server-side com timeout e limite de payload
 - [ ] TSE-006 Implementar last-known-good

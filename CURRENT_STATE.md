@@ -12,12 +12,12 @@
 - wireframe de referência incluído na documentação;
 - schemas oficiais EA11, EA12, EA14, EA15 e EA20 mapeados em `docs/TSE_SCHEMAS.md`;
 - URLs, campos condicionais e regras semânticas necessárias às próximas fixtures e validações documentadas;
-- sete fixtures TSE reduzidas disponíveis em `tests/fixtures/tse`, cobrindo configuração, acompanhamento, majoritário, proporcional e município.
+- sete fixtures TSE reduzidas disponíveis em `tests/fixtures/tse`, cobrindo configuração, acompanhamento, majoritário, proporcional e município;
+- parser e schemas Zod para EA11, EA12, EA14, EA15 e EA20 implementados, incluindo validações aritméticas e de abrangência.
 
 ## Em desenvolvimento
 
 - integração real com arquivos do TSE;
-- validação dos schemas oficiais;
 - conexão com Upstash Redis;
 - interface completa conforme wireframe e identidade PR+.
 
@@ -34,7 +34,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-continuando pelo parser e validação Zod (TSE-003) antes da integração com o ambiente oficial.
+continuando pelo normalizador para o modelo interno PR+ (TSE-004).
 
 ## Handoff TSE-001
 
@@ -52,3 +52,11 @@ continuando pelo parser e validação Zod (TSE-003) antes da integração com o 
 - validação: todos os JSONs são válidos e as identidades aritméticas de seções, eleitorado e votos passam;
 - arquivos alterados: `tests/fixtures/tse/*`, `CURRENT_STATE.md` e `TASKS.md`;
 - falta: transformar as estruturas documentadas em schemas Zod e testes automatizados.
+
+## Handoff TSE-003
+
+- feito: schemas Zod e parser tipado para EA11, EA12, EA14, EA15 e EA20, com erros sanitizados e campos adicionais descartados;
+- validações semânticas: identidades de seções, eleitorado e votos, coerência da abrangência e condicionais de cargo/município;
+- validação: 11 testes automatizados, typecheck e build passam; nove payloads completos do simulado oficial passaram pelos schemas;
+- divergências cobertas: `cdi` vazio no exterior, `nfed` vazio, contadores municipais opcionais no EA14 Brasil e siglas longas de teste no EA20;
+- falta: normalizar o EA20 validado para o modelo interno PR+.
