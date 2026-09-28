@@ -1,0 +1,94 @@
+{
+  "dg": "28/09/2026",
+  "hg": "15:00:00",
+  "f": "s",
+  "idg": "1001",
+  "arq": [
+    {
+      "tp": "cm",
+      "dir": "<base>/<ambiente>/<ciclo>/<cd_eleicao>/config"
+    },
+    {
+      "tp": "ab",
+      "dir": "<base>/<ambiente>/<ciclo>/<cd_eleicao>/dados/<uf>"
+    },
+    {
+      "tp": "u",
+      "dir": "<base>/<ambiente>/<ciclo>/<cd_eleicao>/dados/<uf>"
+    },
+    {
+      "tp": "ft",
+      "dir": "<base>/<ambiente>/<ciclo>/<cd_eleicao>/fotos/<uf>"
+    },
+    {
+      "tp": "t",
+      "dir": "<base>/<ambiente>/<ciclo>/<cd_eleicao>/dados/<uf>"
+    }
+  ],
+  "pl": [
+    {
+      "cd": "17801",
+      "cdpr": "14575",
+      "c": "ele2026",
+      "dt": "04/10/2026",
+      "dtlim": "18/10/2026",
+      "e": [
+        {
+          "cd": "21270",
+          "cdt2": "21271",
+          "sqele": "201780102026",
+          "nm": "Eleição Ordinária Federal - 2026 - 1º Turno",
+          "t": "1",
+          "tp": "8",
+          "abr": [
+            {
+              "cd": "br",
+              "cp": [
+                {
+                  "cd": "1",
+                  "ds": "Presidente",
+                  "tp": "1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cd": "21272",
+          "cdt2": "21273",
+          "sqele": "201780102026",
+          "nm": "Eleição Ordinária Estadual - 2026 - 1º Turno",
+          "t": "1",
+          "tp": "1",
+          "abr": [
+            {
+              "cd": "br",
+              "cp": [
+                {
+                  "cd": "3",
+                  "ds": "Governador",
+                  "tp": "1"
+                },
+                {
+                  "cd": "5",
+                  "ds": "Senador",
+                  "tp": "1"
+                },
+                {
+                  "cd": "6",
+                  "ds": "Deputado Federal",
+                  "tp": "2"
+                },
+                {
+                  "cd": "7",
+                  "ds": "Deputado Estadual",
+                  "tp": "2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

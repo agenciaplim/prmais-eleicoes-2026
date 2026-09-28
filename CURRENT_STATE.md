@@ -11,7 +11,8 @@
 - documentação compartilhada para Codex e Cloud Code criada;
 - wireframe de referência incluído na documentação;
 - schemas oficiais EA11, EA12, EA14, EA15 e EA20 mapeados em `docs/TSE_SCHEMAS.md`;
-- URLs, campos condicionais e regras semânticas necessárias às próximas fixtures e validações documentadas.
+- URLs, campos condicionais e regras semânticas necessárias às próximas fixtures e validações documentadas;
+- sete fixtures TSE reduzidas disponíveis em `tests/fixtures/tse`, cobrindo configuração, acompanhamento, majoritário, proporcional e município.
 
 ## Em desenvolvimento
 
@@ -33,7 +34,7 @@ Implementar o fluxo:
 
 `TSE -> validação -> normalização -> cache -> API -> interface`
 
-começando por fixtures locais representativas (TSE-002) antes da integração com o ambiente oficial.
+continuando pelo parser e validação Zod (TSE-003) antes da integração com o ambiente oficial.
 
 ## Handoff TSE-001
 
@@ -43,3 +44,11 @@ começando por fixtures locais representativas (TSE-002) antes da integração c
 - risco: os PDFs descrevem números como inteiros/decimais, mas o simulado os serializa como strings;
 - risco: o EA12 documenta `cdi` com 5 dígitos, enquanto o payload de 2026 usa o código IBGE de 7 dígitos;
 - risco: o MVP precisa descobrir e consumir eleições federal e estadual, mas a configuração atual expõe um único `TSE_ELECTION_ID`.
+
+## Handoff TSE-002
+
+- feito: fixtures sintéticas para EA11, EA12, EA14, EA15 e três variantes de EA20;
+- cobertura: majoritário, proporcional, município, federação, voto anulado/sub judice, substituição e campos condicionais omitidos;
+- validação: todos os JSONs são válidos e as identidades aritméticas de seções, eleitorado e votos passam;
+- arquivos alterados: `tests/fixtures/tse/*`, `CURRENT_STATE.md` e `TASKS.md`;
+- falta: transformar as estruturas documentadas em schemas Zod e testes automatizados.
