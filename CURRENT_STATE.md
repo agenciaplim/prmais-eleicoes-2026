@@ -233,3 +233,11 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - arquivos: `src/lib/tse/municipal-results.ts`, `src/lib/tse/public-municipal.ts`, `src/app/api/municipalities/route.ts`, `src/lib/tse/collector.ts`, `.env.example`, `README.md`, testes;
 - validação: 88 testes e typecheck passam;
 - pendente: prova online no simulado (o ambiente do agente não acessa o TSE); medir no ensaio (OPS-007) quantos municípios cabem por execução e ajustar orçamento/frequência do coletor.
+
+## Handoff WEB-006
+
+- feito: busca de município no bloco lateral: autocomplete sem acento e por prefixo (depois substring), atalhos "Mais acessados" (Curitiba, Londrina, Maringá, Cascavel, Ponta Grossa) e resultado com top 3 de Presidente e Governador e % apurado;
+- dados: lista de `/api/locations?state=pr` e resultados de `/api/municipalities?...&code=`; respostas conferidas por guardas de tipo antes do uso; falha ou 503 mostra "Resultados ainda não disponíveis";
+- acessibilidade: combobox/listbox com Enter para escolher a primeira sugestão e Esc para limpar;
+- arquivos: `src/components/MunicipalitySearch.tsx`, `src/lib/ui/municipality-search.ts`, `src/app/page.tsx`, `src/app/globals.css`, `tests/web-municipality-search.test.ts`;
+- validação: 91 testes e typecheck passam; fluxo conferido no navegador com catálogo e resultados de fixture.

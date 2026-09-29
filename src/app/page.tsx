@@ -1,6 +1,7 @@
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { Hero } from "@/components/Hero";
 import { LiveCoverage, TvMode } from "@/components/LiveBlocks";
+import { MunicipalitySearch } from "@/components/MunicipalitySearch";
 import { OfficeCard, PresidentCard, TurnoutCard } from "@/components/results/ResultCards";
 import { ResultTabs } from "@/components/ResultTabs";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -97,7 +98,7 @@ export default async function Home() {
             <article className="card"><h2>Últimas atualizações</h2><p className="muted">Aguardando integração TSE.</p></article>
             <article className="card">
               <h2>Buscar município</h2>
-              <input aria-label="Buscar município" placeholder="Digite o nome do município..." />
+              <MunicipalitySearch />
             </article>
             <TvMode embed={live} />
           </aside>

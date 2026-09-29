@@ -114,6 +114,19 @@ h3 { font-size: 15px; }
 .stats small { color: var(--prmais-muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+.combo { position: relative; }
+.suggestions { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); list-style: none; margin: 0; padding: 4px 0; background: var(--prmais-superficie); border: 1px solid var(--prmais-bege); border-radius: 8px; box-shadow: 0 8px 24px rgb(11 27 58 / 12%); }
+.suggestions button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; cursor: pointer; font-weight: 600; }
+.suggestions button:hover, .suggestions button:focus-visible { background: var(--prmais-fundo); }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; font-size: 13px; }
+.chips .muted { margin: 0; }
+.chip { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--prmais-bege); background: var(--prmais-fundo); cursor: pointer; font-size: 12px; font-weight: 700; color: var(--prmais-azul); }
+.muni-result { margin-top: 14px; border-top: 2px solid var(--prmais-azul); padding-top: 10px; }
+.muni-result h3 { margin-bottom: 4px; }
+.muni-office h4 { margin: 10px 0 2px; font-size: 13px; text-transform: uppercase; color: var(--prmais-tinta); }
+.muni-office .muted { font-size: 12px; margin-bottom: 2px; }
+.row-name small { font-weight: 400; }
+
 input { width: 100%; padding: 10px 12px; border: 2px solid var(--prmais-bege); border-radius: 8px; background: var(--prmais-superficie); }
 input:focus { border-color: var(--prmais-azul); }
 

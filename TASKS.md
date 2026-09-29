@@ -48,7 +48,7 @@ Legenda:
 - [x] WEB-003 Implementar abas Paraná / Presidente / Brasil / Municípios — Claude (`cloud/web-results`)
 - [x] WEB-004 Implementar ranking presidencial — Claude (`cloud/web-results`)
 - [x] WEB-005 Implementar Governador / Senado / Deputados — Claude (`cloud/web-results`)
-- [ ] WEB-006 Implementar busca dos 399 municípios
+- [x] WEB-006 Implementar busca dos 399 municípios — Claude (`cloud/web-municipality-search`)
 - [ ] WEB-007 Implementar mapa do Paraná
 - [x] WEB-008 Implementar bloco de transmissão ao vivo configurável (YouTube) e bloco Modo TV/OBS — Claude (`cloud/web-live`)
 - [x] WEB-012 Header com menu do prmais.com, slogan e busca; rodapé com redes do portal — Claude (`cloud/web-header-footer`)
