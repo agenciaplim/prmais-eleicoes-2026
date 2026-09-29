@@ -15,7 +15,7 @@ function Item({ item }: { item: UpdateItem }) {
 export function UpdatesCard({ items }: { items: UpdateItem[] }) {
   const rest = items.slice(VISIBLE);
   return (
-    <article className="card">
+    <article className="card card--updates">
       <h2>Últimas atualizações</h2>
       {items.length === 0 ? (
         <p className="muted">As atualizações aparecem aqui assim que a apuração começar.</p>

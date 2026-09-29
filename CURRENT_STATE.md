@@ -28,7 +28,6 @@
 
 ## Em desenvolvimento
 
-- interface completa conforme wireframe e identidade PR+.
 - provisionamento do Upstash Redis e da hospedagem de produção.
 
 ## Dependências externas ainda não necessárias
@@ -40,7 +39,7 @@
 
 ## Próxima prioridade
 
-Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com resultados por município (TSE-010) e mapa (WEB-007).
+Integrar as branches `cloud/*` e fazer uma coleta real no simulado a partir do Mac (confirmar fotos, municípios e agremiações); depois operação (OPS-001 a OPS-007).
 
 ## Handoff TSE-001
 
@@ -272,3 +271,16 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - validação: 100 testes, typecheck e build passam;
 - risco: o caminho `<ciclo>/<eleição>/fotos/<br|uf>/<sqcand>.jpeg` segue o padrão público de 2022/2024 e não pôde ser verificado no simulado 2026 a partir do ambiente do agente; confirmar numa coleta no Mac antes do ensaio (OPS-007);
 - custo: ~30 fotos × ~20–40 KB em base64 no Upstash, gravadas uma única vez.
+
+## Handoff WEB-009
+
+- feito: ordem mobile do wireframe (status → ranking → cargos do Paraná → busca → transmissão → atualizações → Modo TV) só com CSS (`display: contents` no aside + `order`), sem duplicar componentes;
+- mobile ≤600px: abas em 4 colunas, cards e linhas mais compactos, mapa oculto na aba Paraná (continua na aba Municípios), menu e busca no botão ☰;
+- correção: `Avatar` detecta imagem que falhou antes da hidratação e volta às iniciais;
+- arquivos: `src/app/globals.css`, `src/app/page.tsx`, `src/components/{LiveBlocks,UpdatesCard}.tsx`, `src/components/results/Avatar.tsx`;
+- validação: 100 testes e typecheck passam; conferido em 390px e 1280px com fixtures.
+
+## Estado das branches (2026-09-28)
+
+Branches criadas em sequência, cada uma a partir da anterior, então `cloud/web-mobile` contém todo o trabalho:
+`cloud/tse-timeout-timer` → `cloud/web-identity` → `cloud/web-hero` → `cloud/tse-party-groups` → `cloud/web-header-footer` → `cloud/web-results` → `cloud/web-live` → `cloud/tse-municipal` → `cloud/web-municipality-search` → `cloud/web-map` → `cloud/api-updates` → `cloud/tse-photos` → `cloud/web-mobile`.

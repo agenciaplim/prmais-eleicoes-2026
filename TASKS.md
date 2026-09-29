@@ -52,7 +52,7 @@ Legenda:
 - [x] WEB-007 Implementar mapa do Paraná — Claude (`cloud/web-map`)
 - [x] WEB-008 Implementar bloco de transmissão ao vivo configurável (YouTube) e bloco Modo TV/OBS — Claude (`cloud/web-live`)
 - [x] WEB-012 Header com menu do prmais.com, slogan e busca; rodapé com redes do portal — Claude (`cloud/web-header-footer`)
-- [ ] WEB-009 Implementar versão mobile conforme wireframe
+- [x] WEB-009 Implementar versão mobile conforme wireframe — Claude (`cloud/web-mobile`)
 - [x] WEB-010 Definir tipografia — decisão: manter fonte do sistema
 - [ ] WEB-013 Seletor de região no mapa (aguarda relação município → região geográfica do IBGE)
 - [x] WEB-011 Adicionar `docs/reference/wireframe-prmais-eleicoes.png` ao repositório — Claude (`cloud/web-identity`)

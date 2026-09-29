@@ -177,3 +177,25 @@ input:focus { border-color: var(--prmais-azul); }
   .map-body { grid-template-columns: 1fr; }
   .office-grid { grid-template-columns: 1fr; }
 }
+
+/* Mobile order from the wireframe: status, ranking, Paraná offices, search, live. */
+@media (max-width: 820px) {
+  .grid { display: flex; flex-direction: column; gap: 0; }
+  .grid > aside { display: contents; }
+  .results { order: 1; }
+  .card--search { order: 2; }
+  .card--live { order: 3; }
+  .card--updates { order: 4; }
+  .card--tv { order: 5; }
+}
+
+@media (max-width: 600px) {
+  .card { padding: 16px; margin-bottom: 14px; }
+  .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .tabs button { padding: 8px 2px; font-size: 12px; border-radius: 8px; }
+  .card--map-inline { display: none; }
+  .row:not(.row--compact) { grid-template-columns: 26px 32px minmax(0, 1fr) auto; gap: 8px; }
+  .avatar { width: 32px; height: 32px; }
+  .row-value strong { font-size: 16px; }
+  .hero h1 { font-size: 34px; }
+}

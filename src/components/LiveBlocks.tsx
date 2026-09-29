@@ -21,7 +21,7 @@ function Soon() {
 
 export function LiveCoverage({ embed }: { embed: LiveEmbed }) {
   return (
-    <article className="card">
+    <article className="card card--live">
       <header className="card-head">
         <h2>Cobertura ao vivo</h2>
         {embed && <span className="on-air"><span className="live-dot" aria-hidden="true" />Ao vivo</span>}
@@ -34,7 +34,7 @@ export function LiveCoverage({ embed }: { embed: LiveEmbed }) {
 
 export function TvMode({ embed }: { embed: LiveEmbed }) {
   return (
-    <article className="card">
+    <article className="card card--tv">
       <h2>Modo TV / OBS</h2>
       <p className="muted">Visualização para telão e transmissão, formato 16:9.</p>
       {embed ? <Player embed={embed} title="Modo TV — PR Mais Eleições 2026" /> : <Soon />}

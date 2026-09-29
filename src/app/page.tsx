@@ -25,9 +25,9 @@ async function loadUpdates(): Promise<UpdateItem[]> {
   }
 }
 
-function MapCard() {
+function MapCard({ inline = false }: { inline?: boolean }) {
   return (
-    <article className="card">
+    <article className={inline ? "card card--map-inline" : "card"}>
       <h2>Mapa do Paraná</h2>
       <p className="muted">Clique em um município para ver os resultados locais.</p>
       <PrMap />
@@ -61,7 +61,7 @@ export default async function Home() {
         <>
           <PresidentCard loaded={presidentBr} subtitle="Resultados nacionais" limit={5} />
           {stateOffices}
-          <MapCard />
+          <MapCard inline />
         </>
       )
     },
@@ -101,14 +101,14 @@ export default async function Home() {
         <Hero status={hero} />
 
         <div className="grid">
-          <section>
+          <section className="results">
             <ResultTabs panels={panels} />
           </section>
 
           <aside>
             <LiveCoverage embed={live} />
             <UpdatesCard items={updates} />
-            <article className="card">
+            <article className="card card--search">
               <h2>Buscar município</h2>
               <MunicipalitySearch />
             </article>
