@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCache } from "@/lib/cache";
-import { mockResult } from "@/lib/tse/mock";
-import { readLastKnownGood } from "@/lib/tse/last-known-good";
+import { loadPublicResult } from "@/lib/tse/public-result-loader";
 import { parsePublicResultQuery } from "@/lib/tse/public-results";
 
 export async function GET(request: Request) {
@@ -13,20 +11,19 @@ export async function GET(request: Request) {
     );
   }
 
-  const cache = await getCache();
-  const snapshot = await readLastKnownGood(cache, query.identity);
+  const result = await loadPublicResult(query.identity, query.isDefault);
 
-  if (!snapshot && (process.env.NODE_ENV === "production" || !query.isDefault)) {
+  if (result.source === "unavailable") {
     return NextResponse.json(
       { error: "results unavailable" },
       { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }
 
-  return NextResponse.json(snapshot?.data ?? mockResult, {
+  return NextResponse.json(result.data, {
     headers: {
-      "Cache-Control": snapshot ? "public, max-age=5, stale-while-revalidate=30" : "no-store",
-      ...(snapshot ? { "X-Result-Stored-At": snapshot.storedAt } : {})
+      "Cache-Control": result.source === "cache" ? "public, max-age=5, stale-while-revalidate=30" : "no-store",
+      ...(result.source === "cache" ? { "X-Result-Stored-At": result.storedAt } : {})
     }
   });
 }

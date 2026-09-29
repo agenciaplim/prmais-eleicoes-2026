@@ -1,4 +1,20 @@
 import { BrandLogo } from "@/components/BrandLogo";
+import { LiveHero } from "@/components/LiveHero";
+import { loadPublicResult } from "@/lib/tse/public-result-loader";
+import { buildHeroStatus, type HeroStatus } from "@/lib/ui/hero-status";
+
+// Re-render at most every 15s from our cache; the client hero polls between renders.
+export const revalidate = 15;
+
+async function loadHeroStatus(): Promise<HeroStatus> {
+  try {
+    const result = await loadPublicResult({ scope: "BR", scopeType: "country", office: "president" }, true);
+    return buildHeroStatus(result.source, result.source === "unavailable" ? null : result.data);
+  } catch {
+    // Cache unreachable or misconfigured: render the page without results instead of failing.
+    return buildHeroStatus("unavailable", null);
+  }
+}
 
 const candidates = [
   ["Candidato A", 42.18],
@@ -8,7 +24,9 @@ const candidates = [
 
 const percent = (value: number) => `${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}%`;
 
-export default function Home() {
+export default async function Home() {
+  const hero = await loadHeroStatus();
+
   return (
     <>
       <header className="header">
@@ -21,21 +39,7 @@ export default function Home() {
       </header>
 
       <main className="shell">
-        <section className="hero">
-          <div>
-            <p className="kicker">Central de apuração</p>
-            <h1>Eleições 2026</h1>
-            <p>Acompanhe os resultados em tempo real.</p>
-          </div>
-          <div className="hero-status">
-            <div className="live"><span className="live-dot" aria-hidden="true" />Apuração ao vivo</div>
-            <div className="progress" role="progressbar" aria-valuenow={58.42} aria-valuemin={0} aria-valuemax={100} aria-label="Seções apuradas">
-              <span style={{ width: "58.42%" }} />
-            </div>
-            <p><strong>58,42%</strong> das seções apuradas</p>
-            <small>Dados demonstrativos enquanto a integração TSE não estiver ativa.</small>
-          </div>
-        </section>
+        <LiveHero initial={hero} />
 
         <nav className="tabs" aria-label="Filtros de resultados">
           <button aria-pressed="true">Paraná</button>

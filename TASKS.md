@@ -44,7 +44,7 @@ Legenda:
 ## Interface
 
 - [x] WEB-001 Aplicar identidade visual real do PR+ — Claude (`cloud/web-identity`)
-- [ ] WEB-002 Implementar hero “Eleições 2026 / Apuração ao vivo”
+- [x] WEB-002 Implementar hero “Eleições 2026 / Apuração ao vivo” — Claude (`cloud/web-hero`)
 - [ ] WEB-003 Implementar abas Paraná / Presidente / Brasil / Municípios
 - [ ] WEB-004 Implementar ranking presidencial
 - [ ] WEB-005 Implementar Governador / Senado / Deputados

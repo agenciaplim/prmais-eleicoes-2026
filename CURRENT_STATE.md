@@ -23,6 +23,7 @@
 - coletor server-side descobre eleições pelo EA11 e promove seis resultados agregados, acionado apenas por rota interna autenticada.
 - catálogo EA12 versionado armazena as 27 UFs e seus municípios e é exposto por `/api/locations` sem fetch público.
 - identidade PR+ aplicada: logos oficiais em `public/brand/`, paleta em tokens CSS e componente `BrandLogo`.
+- hero exibe status real da apuração (ao vivo, encerrada, aguardando), horário de Brasília e % de seções, lido do cache e atualizado no cliente a cada 30s.
 
 ## Em desenvolvimento
 
@@ -38,7 +39,7 @@
 
 ## Próxima prioridade
 
-Implementar o hero com status real de apuração (WEB-002) e as abas (WEB-003), consumindo somente as APIs internas já preparadas.
+Implementar as abas Paraná / Presidente / Brasil / Municípios (WEB-003) e o ranking presidencial (WEB-004), consumindo somente as APIs internas.
 
 ## Handoff TSE-001
 
@@ -172,3 +173,14 @@ Implementar o hero com status real de apuração (WEB-002) e as abas (WEB-003), 
 - novas tarefas: TSE-010 (resultados por município), TSE-011 (votos por partido), TSE-012 (fotos TSE), API-003 (atualizações automáticas) e WEB-012 (header/rodapé do portal);
 - risco: fotos do TSE exigem nova origem allowlisted no coletor e armazenamento; avaliar tamanho no Upstash antes de implementar;
 - próximo: WEB-002 e WEB-003, que já podem consumir `/api/results`.
+
+## Handoff WEB-002
+
+- feito: hero conforme wireframe (título, selo de status e bloco "Atualizado às HH:MM" + "% das seções apuradas");
+- dados: página renderizada no servidor a partir do cache (`revalidate = 15`) e componente cliente `LiveHero` que consulta `/api/results` a cada 30s, só com a aba visível e timeout de 10s;
+- resiliência: resposta 503, erro de rede ou payload inválido mantêm o último estado válido na tela; cache inacessível no render mostra "Aguardando dados" sem derrubar a página;
+- estados: "Apuração ao vivo" (laranja), "Apuração encerrada", "Aguardando início" e "Aguardando dados"; avisos para dados de simulação do TSE e dados demonstrativos;
+- refatoração: `loadPublicResult` concentra a regra cache → mock (só dev e só na consulta padrão) → indisponível, usada pela API e pela página; comportamento da API inalterado;
+- arquivos: `src/lib/tse/public-result-loader.ts`, `src/lib/ui/hero-status.ts`, `src/components/LiveHero.tsx`, `src/app/page.tsx`, `src/app/api/results/route.ts`, `src/app/globals.css`, `tests/web-hero.test.ts`;
+- validação: 76 testes, typecheck e build passam; hero conferido por screenshot em desktop e mobile, nos estados sem dados e ao vivo;
+- nota: o polling usa a mesma rota pública com `max-age=5`; em produção, avaliar o intervalo junto com o rate limit (OPS-005).
