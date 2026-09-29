@@ -97,3 +97,13 @@ A identidade visual utilizada será a do PR+.
 **Motivo:** o arquivo estadual observado no simulado contém as 27 UFs e 5.571 municípios brasileiros; ele atende a busca dos 399 municípios do Paraná sem misturar localidades estrangeiras ao índice de estados.
 
 **API:** `/api/locations` publica apenas o índice leve de UFs; `/api/locations?state=<uf>` publica os municípios de uma UF por vez.
+
+---
+
+## 2026-09-28 — Tokens de identidade PR+
+
+**Decisão:** concentrar a identidade em variáveis CSS (`--prmais-*`, `--font-*`) em `globals.css` e servir as logos como PNG recortado em `public/brand/` via `next/image`.
+
+**Motivo:** a paleta vem diretamente das quatro variantes oficiais da logo; trocar a tipografia ou ajustar cores exige alterar apenas os tokens.
+
+**Limite:** verde (`#0BDB15`) e laranja (`#FF6C00`) não têm contraste suficiente como texto sobre branco e só devem ser usados sobre azul ou como fundo de elementos com texto escuro.

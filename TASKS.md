@@ -36,7 +36,7 @@ Legenda:
 
 ## Interface
 
-- [ ] WEB-001 Aplicar identidade visual real do PR+
+- [x] WEB-001 Aplicar identidade visual real do PR+ — Claude (`cloud/web-identity`)
 - [ ] WEB-002 Implementar hero “Eleições 2026 / Apuração ao vivo”
 - [ ] WEB-003 Implementar abas Paraná / Presidente / Brasil / Municípios
 - [ ] WEB-004 Implementar ranking presidencial
@@ -45,6 +45,8 @@ Legenda:
 - [ ] WEB-007 Implementar mapa do Paraná
 - [ ] WEB-008 Implementar bloco de transmissão ao vivo configurável
 - [ ] WEB-009 Implementar versão mobile conforme wireframe
+- [ ] WEB-010 Aplicar tipografia oficial do PR+ (aguarda definição da fonte)
+- [ ] WEB-011 Adicionar `docs/reference/wireframe-prmais-eleicoes.png` ao repositório
 
 ## Operação
 

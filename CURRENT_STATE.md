@@ -22,6 +22,7 @@
 - adaptador Upstash Redis disponível com configuração validada e cache em memória isolado e restrito ao desenvolvimento.
 - coletor server-side descobre eleições pelo EA11 e promove seis resultados agregados, acionado apenas por rota interna autenticada.
 - catálogo EA12 versionado armazena as 27 UFs e seus municípios e é exposto por `/api/locations` sem fetch público.
+- identidade PR+ aplicada: logos oficiais em `public/brand/`, paleta em tokens CSS e componente `BrandLogo`.
 
 ## Em desenvolvimento
 
@@ -37,7 +38,7 @@
 
 ## Próxima prioridade
 
-Aplicar a identidade visual real do PR+ na interface (WEB-001), consumindo somente as APIs internas já preparadas.
+Implementar o hero com status real de apuração (WEB-002) e as abas (WEB-003), consumindo somente as APIs internas já preparadas.
 
 ## Handoff TSE-001
 
@@ -151,3 +152,16 @@ Aplicar a identidade visual real do PR+ na interface (WEB-001), consumindo somen
 - arquivos alterados: `src/lib/tse/client.ts`, `CURRENT_STATE.md` e `TASKS.md`;
 - validação: 68 testes (0 cancelados), typecheck e build passam; build executado em cópia fora da pasta montada, pois o ambiente do agente não pode apagar `.next/`;
 - falta: nenhuma tarefa TSE pendente; próxima prioridade segue WEB-001.
+
+## Handoff WEB-001
+
+- feito: logos oficiais recortadas das artes em `assets/01-04.png` (azul, bege, verde, laranja) para `public/brand/prmais-*.png` (711×192, fundo transparente);
+- paleta: tokens `--prmais-azul #013FA2`, `--prmais-bege #DDDFD2`, `--prmais-verde #0BDB15`, `--prmais-laranja #FF6C00` em `src/app/globals.css`, mais derivados funcionais (tinta, fundo, azul-escuro);
+- aplicação: header branco com logo azul, hero azul com status ao vivo em verde, abas em pílula, cards com filete azul, líder do ranking em laranja, rodapé azul com logo bege; `themeColor` azul; foco visível em laranja; `prefers-reduced-motion` respeitado;
+- estrutura: blocos e ordem da página mantidos; nenhum dado novo nem chamada a API adicionados; textos corrigidos com acentuação;
+- contraste: verde e laranja são usados só sobre azul ou como fundo com texto escuro, nunca como texto sobre branco;
+- arquivos alterados: `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/BrandLogo.tsx`, `public/brand/*`, `docs/DECISIONS.md`, `CURRENT_STATE.md` e `TASKS.md`;
+- validação: 68 testes, typecheck e build passam; página conferida por screenshot em 1280px e 390px;
+- pendente: tipografia oficial do PR+ não foi fornecida e não pôde ser obtida do portal; os tokens `--font-display`/`--font-body` usam pilha de sistema (WEB-010);
+- pendente: `docs/reference/wireframe-prmais-eleicoes.png` citado em `docs/WIREFRAME.md` não existe no repositório (WEB-011);
+- nota: a pasta `assets/` com as artes originais não está versionada; decidir se entra no Git.
