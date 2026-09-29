@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { createMemoryCache } from "../src/lib/cache";
-import { TseFetchError, type TseClient, type TseFileRequest } from "../src/lib/tse/client";
+import { TseFetchError, type TseClient, type TseFileRequest, type TsePhotoRequest } from "../src/lib/tse/client";
 import {
   collectElectionResults,
   collectorConfigFromEnv,
@@ -64,7 +64,8 @@ function fakeClient(
   payloadByTarget: Map<string, Ea20Payload>,
   failOffice?: string,
   requests: TseFileRequest[] = [],
-  failCatalog = false
+  failCatalog = false,
+  photoRequests: TsePhotoRequest[] = []
 ): TseClient {
   return {
     buildUrl() {
@@ -82,6 +83,13 @@ function fakeClient(
       const payload = payloadByTarget.get(`${request.officeCode}:${request.scope.type}`);
       if (!payload) throw new Error("missing fake payload");
       return payload;
+    },
+    buildPhotoUrl() {
+      throw new Error("not used by collector");
+    },
+    async fetchPhoto(request: TsePhotoRequest) {
+      photoRequests.push(request);
+      return new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00]);
     }
   } as TseClient;
 }
@@ -148,6 +156,7 @@ test("collects and promotes all six first-round aggregate targets", async () => 
 
   const updates = await readUpdates(cache);
   assert.ok(updates.length > 0);
+  assert.ok((report.photos?.fetched ?? 0) > 0);
 
   const repeated = await collectElectionResults({ client, cache, config: { uf: "pr", round: "1" } });
   assert.deepEqual(await readUpdates(cache), updates);

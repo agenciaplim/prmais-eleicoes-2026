@@ -33,6 +33,12 @@ function client(base: Ea20Payload, options: { fail?: Set<string>; time?: (code: 
       payload.cdabr = code;
       if (options.time) payload.ht = options.time(code);
       return payload;
+    },
+    buildPhotoUrl() {
+      throw new Error("unused");
+    },
+    async fetchPhoto() {
+      throw new Error("unused");
     }
   } as TseClient;
 }

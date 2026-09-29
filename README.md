@@ -60,6 +60,12 @@ Resultados por município (Presidente e Governador no Paraná), também cache-on
 /api/municipalities?office=governor&code=75353    um município (código TSE de 5 dígitos), top 5
 ```
 
+Fotos oficiais dos candidatos majoritários, coletadas pelo servidor e servidas pela nossa origem:
+
+```text
+/api/photos/<sqcand>
+```
+
 O coletor busca os municípios em lotes: cada execução usa até `TSE_MUNICIPAL_BUDGET_MS` por cargo e continua de onde parou na execução seguinte.
 
 Quando o Upstash estiver configurado, altere:

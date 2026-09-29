@@ -1,5 +1,6 @@
 import type { CandidateResult, CandidateStatus } from "@/lib/tse/types";
 import { formatPercent, formatVotes } from "@/lib/ui/format";
+import { Avatar } from "./Avatar";
 
 const statusLabel: Partial<Record<CandidateStatus, string>> = {
   elected: "Eleito",
@@ -9,16 +10,12 @@ const statusLabel: Partial<Record<CandidateStatus, string>> = {
   alternate: "Suplente"
 };
 
-function initials(name: string) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("");
-}
-
 function Row({ candidate, compact }: { candidate: CandidateResult; compact: boolean }) {
   const label = statusLabel[candidate.status];
   return (
     <li className={compact ? "row row--compact" : "row"}>
       <span className={candidate.rank === 1 ? "rank rank-lead" : "rank"}>{candidate.rank}</span>
-      {!compact && <span className="avatar" aria-hidden="true">{initials(candidate.name)}</span>}
+      {!compact && <Avatar id={candidate.id} name={candidate.name} />}
       <div className="row-main">
         <span className="row-name">
           {candidate.name}

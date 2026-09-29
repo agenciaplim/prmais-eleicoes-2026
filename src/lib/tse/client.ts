@@ -50,6 +50,12 @@ export type TseFileRequest =
   | ({ kind: "EA15"; uf: string } & ElectionFileRequest)
   | ({ kind: "EA20"; officeCode: string; scope: Ea20Scope } & ElectionFileRequest);
 
+// Candidate photos published with the results (not signed). Pattern observed in 2022/2024 results:
+// <base>/<ambiente>/<ciclo>/<eleicao>/fotos/<br|uf>/<sqcand>.jpeg
+export type TsePhotoRequest = ElectionFileRequest & { scope: "br" | string; candidateId: string };
+
+const MAX_PHOTO_BYTES = 300 * 1024;
+
 export type TseClientConfig = {
   baseUrl: string;
   environment: string;
@@ -281,7 +287,7 @@ function assertPayloadMatchesRequest(
   }
 }
 
-async function readLimitedBody(response: Response, maxPayloadBytes: number): Promise<string> {
+async function readLimitedBytes(response: Response, maxPayloadBytes: number): Promise<Uint8Array> {
   const contentLength = response.headers.get("content-length");
   if (contentLength !== null) {
     const declaredLength = Number(contentLength);
@@ -326,7 +332,11 @@ async function readLimitedBody(response: Response, maxPayloadBytes: number): Pro
     body.set(chunk, offset);
     offset += chunk.byteLength;
   }
+  return body;
+}
 
+async function readLimitedBody(response: Response, maxPayloadBytes: number): Promise<string> {
+  const body = await readLimitedBytes(response, maxPayloadBytes);
   try {
     return new TextDecoder("utf-8", { fatal: true }).decode(body);
   } catch {
@@ -491,7 +501,53 @@ export function createTseClient(config: TseClientConfig, fetchImplementation: Fe
     return payload;
   }
 
-  return { buildUrl, fetchPayload };
+  function buildPhotoUrl(request: TsePhotoRequest): URL {
+    const { directoryId } = electionPath(request);
+    const scope = request.scope === "br" ? "br" : normalizeUf(request.scope);
+    assertPattern(request.candidateId, /^\d{9,15}$/, "candidate ID");
+    return new URL(`${normalizedConfig.baseUrl}/${normalizedConfig.environment}/${request.cycle}/${directoryId}/fotos/${scope}/${request.candidateId}.jpeg`);
+  }
+
+  async function fetchPhoto(request: TsePhotoRequest): Promise<Uint8Array> {
+    const url = buildPhotoUrl(request);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(new DOMException("TSE request timed out", "TimeoutError")), normalizedConfig.timeoutMs);
+
+    try {
+      let response: Response;
+      try {
+        response = await fetchImplementation(url, {
+          method: "GET",
+          headers: { Accept: "image/jpeg" },
+          redirect: "error",
+          cache: "no-store",
+          credentials: "omit",
+          signal: controller.signal
+        });
+      } catch {
+        throw new TseFetchError(controller.signal.aborted ? "TIMEOUT" : "NETWORK_ERROR", "TSE photo request failed");
+      }
+
+      if (!response.ok) throw new TseFetchError("HTTP_ERROR", `TSE returned HTTP ${response.status}`, response.status);
+      const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+      if (!/^image\/jpe?g(?:\s*;|$)/.test(contentType)) {
+        throw new TseFetchError("INVALID_CONTENT_TYPE", "TSE photo is not JPEG");
+      }
+
+      const bytes = await readLimitedBytes(response, Math.min(MAX_PHOTO_BYTES, normalizedConfig.maxPayloadBytes)).catch((error) => {
+        if (error instanceof TseFetchError) throw error;
+        throw new TseFetchError(controller.signal.aborted ? "TIMEOUT" : "NETWORK_ERROR", "TSE photo could not be read");
+      });
+      if (bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) {
+        throw new TseFetchError("INVALID_CONTENT_TYPE", "TSE photo has no JPEG signature");
+      }
+      return bytes;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return { buildUrl, fetchPayload, buildPhotoUrl, fetchPhoto };
 }
 
 export type TseClient = ReturnType<typeof createTseClient>;

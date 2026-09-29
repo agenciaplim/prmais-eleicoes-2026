@@ -10,6 +10,7 @@ import {
 } from "./client";
 import { promoteLastKnownGood } from "./last-known-good";
 import { appendUpdates, deriveUpdates, type UpdateItem } from "./updates";
+import { collectPhotos, type PhotoReport, type PhotoTarget } from "./photos";
 import { normalizeEa12Catalog, promoteLocationCatalog, readLocationCatalog } from "./location-catalog";
 import { collectMunicipalResults, type MunicipalCollectionReport } from "./municipal-results";
 import { normalizeEa20, TseNormalizationError } from "./normalizer";
@@ -54,6 +55,7 @@ export type CollectionReport = {
   };
   items: CollectionItem[];
   municipal: MunicipalCollectionReport[];
+  photos?: PhotoReport;
 };
 
 export class TseCollectorError extends Error {
@@ -223,6 +225,7 @@ export async function collectElectionResults(options: {
   }
 
   const updates: UpdateItem[] = [];
+  const photoTargets: PhotoTarget[] = [];
   for (const target of collectionTargets(discovery, options.config.uf)) {
     try {
       const request: Extract<TseFileRequest, { kind: "EA20" }> = {
@@ -241,6 +244,14 @@ export async function collectElectionResults(options: {
 
       const promotion = await promoteLastKnownGood(options.cache, result, now);
       if (promotion.promoted) updates.push(...deriveUpdates(promotion.previous?.data ?? null, promotion.snapshot.data));
+      if (["president", "governor", "senator"].includes(target.office)) {
+        photoTargets.push({
+          cycle: discovery.cycle,
+          electionId: target.electionId,
+          scope: target.scope.type === "country" ? "br" : options.config.uf,
+          candidateIds: promotion.snapshot.data.candidates.map((candidate) => candidate.id)
+        });
+      }
       items.push({
         office: target.office,
         scope: target.scopeLabel,
@@ -256,6 +267,13 @@ export async function collectElectionResults(options: {
     await appendUpdates(options.cache, updates);
   } catch {
     // Updates are editorial extras; a failure here never affects results.
+  }
+
+  let photos: PhotoReport | undefined;
+  try {
+    photos = await collectPhotos({ client: options.client, cache: options.cache, targets: photoTargets, now });
+  } catch {
+    // Photos are optional; results never depend on them.
   }
 
   const municipal: MunicipalCollectionReport[] = [];
@@ -285,7 +303,7 @@ export async function collectElectionResults(options: {
     }
   }
 
-  return { startedAt, finishedAt: now().toISOString(), discovery, catalog, items, municipal };
+  return { startedAt, finishedAt: now().toISOString(), discovery, catalog, items, municipal, photos };
 }
 
 export function collectorConfigFromEnv(env: Readonly<Record<string, string | undefined>> = process.env): CollectorConfig {

@@ -261,3 +261,14 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - interface: `UpdatesCard` com horário de Brasília, 5 itens visíveis e "Ver todas as atualizações";
 - arquivos: `src/lib/tse/updates.ts`, `src/lib/tse/last-known-good.ts`, `src/lib/tse/collector.ts`, `src/components/UpdatesCard.tsx`, `src/app/page.tsx`, `src/app/globals.css`, `tests/tse-updates.test.ts`, `tests/tse-collector.test.ts`;
 - validação: 97 testes e typecheck passam; bloco conferido no navegador.
+
+## Handoff TSE-012
+
+- feito: fotos oficiais dos candidatos a Presidente, Governador e Senador coletadas pelo coletor e servidas por `/api/photos/<sqcand>`; o navegador nunca acessa o TSE;
+- cliente: `fetchPhoto` com URL montada só de partes validadas (ciclo, eleição, `br`/UF, `sqcand` numérico), mesma allowlist, HTTPS, sem redirect e timeout; exige `image/jpeg`, assinatura JPEG (`FF D8 FF`) e no máximo 300 KB; leitura de bytes separada da decodificação UTF-8 (`readLimitedBytes`);
+- armazenamento: `photos:v1:<sqcand>` em base64 sem TTL, índice `photos:v1:index` para não reler; cada foto é buscada uma vez, até 20 por execução; falha de foto não afeta resultados;
+- interface: `Avatar` exibe a foto e volta às iniciais se ela ainda não existir;
+- arquivos: `src/lib/tse/client.ts`, `src/lib/tse/photos.ts`, `src/lib/tse/collector.ts`, `src/app/api/photos/[id]/route.ts`, `src/components/results/{Avatar,CandidateList}.tsx`, `src/app/globals.css`, `README.md`, testes;
+- validação: 100 testes, typecheck e build passam;
+- risco: o caminho `<ciclo>/<eleição>/fotos/<br|uf>/<sqcand>.jpeg` segue o padrão público de 2022/2024 e não pôde ser verificado no simulado 2026 a partir do ambiente do agente; confirmar numa coleta no Mac antes do ensaio (OPS-007);
+- custo: ~30 fotos × ~20–40 KB em base64 no Upstash, gravadas uma única vez.
