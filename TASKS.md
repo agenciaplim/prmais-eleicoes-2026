@@ -46,7 +46,7 @@ Legenda:
 - [ ] WEB-008 Implementar bloco de transmissão ao vivo configurável
 - [ ] WEB-009 Implementar versão mobile conforme wireframe
 - [ ] WEB-010 Aplicar tipografia oficial do PR+ (aguarda definição da fonte)
-- [ ] WEB-011 Adicionar `docs/reference/wireframe-prmais-eleicoes.png` ao repositório
+- [x] WEB-011 Adicionar `docs/reference/wireframe-prmais-eleicoes.png` ao repositório — Claude (`cloud/web-identity`)
 
 ## Operação
 
