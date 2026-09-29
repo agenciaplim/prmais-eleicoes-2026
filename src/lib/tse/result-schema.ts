@@ -49,7 +49,20 @@ const candidateSchema = z.object({
 
 const nullableCountSchema = safeCountSchema.nullable();
 
-export const electionResultSchema: z.ZodType<ElectionResult> = z.object({
+const partyGroupSchema = z.object({
+  id: z.string().regex(/^\d+$/),
+  type: z.enum(["federation", "party", "coalition"]),
+  acronym: z.string().min(1),
+  name: z.string().min(1),
+  parties: z.array(z.string().min(1)),
+  votes: safeCountSchema,
+  nominalVotes: safeCountSchema,
+  partyListVotes: safeCountSchema,
+  percentage: percentageSchema,
+  seats: nullableCountSchema
+});
+
+export const electionResultSchema = z.object({
   sourceId: z.string().regex(/^\d+$/),
   electionId: z.string().regex(/^\d+$/),
   round: z.union([z.literal(1), z.literal(2)]),
@@ -92,5 +105,7 @@ export const electionResultSchema: z.ZodType<ElectionResult> = z.object({
     canceledWithoutValidity: safeCountSchema,
     withoutAnnulment: safeCountSchema
   }),
-  candidates: z.array(candidateSchema)
-});
+  candidates: z.array(candidateSchema),
+  // Default keeps snapshots stored before TSE-011 readable.
+  groups: z.array(partyGroupSchema).default([])
+}) as z.ZodType<ElectionResult>;

@@ -83,5 +83,6 @@ export const mockResult: ElectionResult = {
       runningMates: [],
       substitutes: []
     }
-  ]
+  ],
+  groups: []
 };

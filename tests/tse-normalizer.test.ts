@@ -143,3 +143,27 @@ test("rejects office codes outside the PR+ result model", async () => {
     (error: unknown) => error instanceof TseNormalizationError && error.code === "UNSUPPORTED_OFFICE"
   );
 });
+
+test("normalizes proportional vote totals per federation or party", async () => {
+  const [result] = normalizeEa20(await readEa20Fixture("ea20-deputy-federal-pr.json"));
+
+  assert.deepEqual(result?.groups, [
+    {
+      id: "100",
+      type: "federation",
+      acronym: "FE",
+      name: "FEDERAÇÃO EXEMPLO",
+      parties: ["PA", "PB"],
+      votes: 18000,
+      nominalVotes: 16000,
+      partyListVotes: 2000,
+      percentage: 100,
+      seats: 2
+    }
+  ]);
+});
+
+test("keeps party groups empty for majoritarian offices", async () => {
+  const [result] = normalizeEa20(await readEa20Fixture("ea20-president-br.json"));
+  assert.deepEqual(result?.groups, []);
+});

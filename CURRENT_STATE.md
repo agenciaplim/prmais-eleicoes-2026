@@ -184,3 +184,12 @@ Implementar as abas Paraná / Presidente / Brasil / Municípios (WEB-003) e o ra
 - arquivos: `src/lib/tse/public-result-loader.ts`, `src/lib/ui/hero-status.ts`, `src/components/LiveHero.tsx`, `src/app/page.tsx`, `src/app/api/results/route.ts`, `src/app/globals.css`, `tests/web-hero.test.ts`;
 - validação: 76 testes, typecheck e build passam; hero conferido por screenshot em desktop e mobile, nos estados sem dados e ao vivo;
 - nota: o polling usa a mesma rota pública com `max-age=5`; em produção, avaliar o intervalo junto com o rate limit (OPS-005).
+
+## Handoff TSE-011
+
+- feito: `ElectionResult.groups` com votos por federação/partido isolado nos cargos proporcionais (sigla, nome, partidos, votos nominais + legenda, % sobre válidos e vagas `vag`);
+- origem: totais `tvtn`/`tvtl` da agremiação no EA20; no fixture a soma confere com `v.vv`; cargos majoritários retornam `groups: []`;
+- compatibilidade: o schema do snapshot usa `groups` com padrão `[]`, então snapshots gravados antes continuam válidos; `/api/results` passa a expor o campo sem mudar parâmetros;
+- arquivos: `src/lib/tse/types.ts`, `normalizer.ts`, `result-schema.ts`, `mock.ts` e testes de normalizador/last-known-good;
+- validação: 79 testes e typecheck passam;
+- risco: confirmar no simulado oficial que `tvtn` já exclui votos anulados de partidos com `dvt=Anulado`.

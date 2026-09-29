@@ -83,3 +83,12 @@ test("treats malformed cached data as unavailable without deleting it", async ()
   assert.equal(await readLastKnownGood(cache, identity), null);
   assert.notEqual(await cache.get(key), null);
 });
+
+test("reads snapshots stored before party groups existed", async () => {
+  const cache = createMemoryCache();
+  const { groups: _groups, ...legacy } = result();
+  await cache.set(electionResultCacheKey(identity), { version: 1, storedAt: new Date().toISOString(), data: legacy });
+
+  const snapshot = await readLastKnownGood(cache, identity);
+  assert.deepEqual(snapshot?.data.groups, []);
+});

@@ -50,6 +50,22 @@ export type CandidateResult = {
   substitutes: Substitute[];
 };
 
+export type PartyGroupType = "federation" | "party" | "coalition";
+
+// Proportional offices only: vote totals per federation or isolated party.
+export type PartyGroupResult = {
+  id: string;
+  type: PartyGroupType;
+  acronym: string;
+  name: string;
+  parties: string[];
+  votes: number;
+  nominalVotes: number;
+  partyListVotes: number;
+  percentage: number;
+  seats: number | null;
+};
+
 export type SectionTotals = {
   total: number;
   totalized: number;
@@ -100,4 +116,5 @@ export type ElectionResult = {
   electorate: ElectorateTotals;
   votes: VoteTotals;
   candidates: CandidateResult[];
+  groups: PartyGroupResult[];
 };

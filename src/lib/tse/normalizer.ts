@@ -7,6 +7,8 @@ import type {
   ElectionResult,
   ElectionScopeType,
   ElectionStatus,
+  PartyGroupResult,
+  PartyGroupType,
   TicketRole,
   VoteDestination
 } from "./types";
@@ -113,6 +115,37 @@ function normalizeCandidate(
   };
 }
 
+type Ea20Office = NonNullable<Ea20Payload["carg"]>[number];
+
+const groupTypeByTse = { f: "federation", i: "party", c: "coalition" } as const satisfies Record<string, PartyGroupType>;
+
+// Group totals come from the TSE (tvtn nominal + tvtl party-list); percentages use valid votes.
+function normalizeGroups(office: Ea20Office, validVotes: number | null): PartyGroupResult[] {
+  const groups = office.agr.map((group) => {
+    const nominalVotes = toNumber(group.tvtn ?? "0");
+    const partyListVotes = toNumber(group.tvtl ?? "0");
+    const federation = office.fed.find((item) => item.n === group.n);
+    const acronym = group.tp === "f" ? federation?.sg ?? group.nm : group.tp === "i" ? group.par[0]!.sg : group.nm;
+    return {
+      id: group.n,
+      type: groupTypeByTse[group.tp],
+      acronym,
+      name: federation?.nm ?? (group.tp === "i" ? group.par[0]!.nm : group.nm),
+      parties: group.par.map((party) => party.sg),
+      votes: nominalVotes + partyListVotes,
+      nominalVotes,
+      partyListVotes,
+      percentage: 0,
+      seats: group.vag === undefined ? null : toNumber(group.vag)
+    };
+  });
+
+  const total = validVotes ?? groups.reduce((sum, group) => sum + group.votes, 0);
+  return groups
+    .map((group) => ({ ...group, percentage: total > 0 ? Math.min(100, (group.votes / total) * 100) : 0 }))
+    .sort((left, right) => right.votes - left.votes || left.acronym.localeCompare(right.acronym));
+}
+
 function officeForCode(code: string): ElectionOffice {
   const office = officeByCode[code as keyof typeof officeByCode];
   if (!office) {
@@ -134,6 +167,8 @@ export function normalizeEa20(payload: Ea20Payload): ElectionResult[] {
       .flatMap((group) => group.par)
       .flatMap((party) => (party.cand ?? []).map((candidate) => normalizeCandidate(candidate, party)))
       .sort((left, right) => left.rank - right.rank);
+    const validVotes = payload.v.vv === undefined ? null : toNumber(payload.v.vv);
+    const proportional = office.qe !== undefined;
 
     return {
       sourceId: payload.idg,
@@ -178,7 +213,8 @@ export function normalizeEa20(payload: Ea20Payload): ElectionResult[] {
         canceledWithoutValidity: toNumber(payload.v.vscv),
         withoutAnnulment: toNumber(payload.v.vsan)
       },
-      candidates
+      candidates,
+      groups: proportional ? normalizeGroups(office, validVotes) : []
     };
   });
 }
