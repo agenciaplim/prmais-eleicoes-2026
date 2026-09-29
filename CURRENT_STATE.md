@@ -241,3 +241,13 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - acessibilidade: combobox/listbox com Enter para escolher a primeira sugestão e Esc para limpar;
 - arquivos: `src/components/MunicipalitySearch.tsx`, `src/lib/ui/municipality-search.ts`, `src/app/page.tsx`, `src/app/globals.css`, `tests/web-municipality-search.test.ts`;
 - validação: 91 testes e typecheck passam; fluxo conferido no navegador com catálogo e resultados de fixture.
+
+## Handoff WEB-007
+
+- feito: mapa SVG dos 399 municípios (Paraná e aba Municípios), colorido pelo candidato que lidera em cada cidade; os três candidatos com mais municípios recebem azul, laranja e verde, os demais "Outros" e sem resultado "Sem dados";
+- interação: seletor Presidente/Governador, hover com líder e %, clique abre o top do município (mesmo componente da busca); dados de `/api/municipalities`, atualizados a cada 60s e mantendo a última lista válida em falha;
+- geometria: `public/maps/pr-municipios.json` (224 KB, 79 KB gzip) gerado por `scripts/build-pr-map.py` (stdlib, projeção equiretangular + Douglas-Peucker) a partir de `tbrugz/geodata-br` `geojs-41-mun.json` (perímetros IBGE, CC0 1.0); junção pelo código IBGE de 7 dígitos;
+- acessibilidade: SVG com `role="img"` e `<title>` por município; navegação por teclado é atendida pela busca de município;
+- arquivos: `src/components/PrMap.tsx`, `src/lib/ui/map-colors.ts`, `scripts/build-pr-map.py`, `public/maps/pr-municipios.json`, `src/app/page.tsx`, `src/app/globals.css`, `tests/web-map.test.ts`;
+- validação: 93 testes e typecheck passam; mapa conferido no navegador com dados de fixture;
+- pendente (WEB-013): seletor "Selecione uma região" do wireframe; a API do IBGE com a relação município → região não é acessível a partir do ambiente do agente.

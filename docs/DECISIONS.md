@@ -147,3 +147,11 @@ A identidade visual utilizada será a do PR+.
 **Resiliência:** last-known-good por município (falha ou regressão mantém a entrada anterior); cada execução tem orçamento de tempo e cursor rotativo, retomando de onde parou, para caber no limite de execução das funções serverless.
 
 **Limite:** outros cargos por município ficam fora do MVP.
+
+---
+
+## 2026-09-28 — Mapa em SVG estático
+
+**Decisão:** gerar uma vez o SVG simplificado dos municípios (`public/maps/pr-municipios.json`) com script Python sem dependências e renderizá-lo em React, sem biblioteca de mapas nem tiles externos.
+
+**Motivo:** nenhuma dependência nova, nenhum serviço externo em tempo de execução e arquivo estático cacheável pela CDN.

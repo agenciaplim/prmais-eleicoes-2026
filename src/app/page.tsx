@@ -2,6 +2,7 @@ import { AutoRefresh } from "@/components/AutoRefresh";
 import { Hero } from "@/components/Hero";
 import { LiveCoverage, TvMode } from "@/components/LiveBlocks";
 import { MunicipalitySearch } from "@/components/MunicipalitySearch";
+import { PrMap } from "@/components/PrMap";
 import { OfficeCard, PresidentCard, TurnoutCard } from "@/components/results/ResultCards";
 import { ResultTabs } from "@/components/ResultTabs";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -13,12 +14,12 @@ import { buildHeroStatus } from "@/lib/ui/hero-status";
 // Re-render at most every 15s from our cache; AutoRefresh pulls new renders every 30s.
 export const revalidate = 15;
 
-function MapPlaceholder() {
+function MapCard() {
   return (
     <article className="card">
       <h2>Mapa do Paraná</h2>
       <p className="muted">Clique em um município para ver os resultados locais.</p>
-      <div className="placeholder">Mapa interativo dos 399 municípios</div>
+      <PrMap />
     </article>
   );
 }
@@ -49,7 +50,7 @@ export default async function Home() {
         <>
           <PresidentCard loaded={presidentBr} subtitle="Resultados nacionais" limit={5} />
           {stateOffices}
-          <MapPlaceholder />
+          <MapCard />
         </>
       )
     },
@@ -76,7 +77,7 @@ export default async function Home() {
     {
       id: "municipios",
       label: "Municípios",
-      content: <MapPlaceholder />
+      content: <MapCard />
     }
   ];
 

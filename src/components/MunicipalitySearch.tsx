@@ -13,7 +13,7 @@ import {
 
 const TIMEOUT_MS = 10_000;
 
-async function getJson(url: string): Promise<unknown | null> {
+export async function getJson(url: string): Promise<unknown | null> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
     return response.ok ? await response.json() : null;
@@ -24,7 +24,7 @@ async function getJson(url: string): Promise<unknown | null> {
 
 type Selection = { option: MunicipalityOption; president: MunicipalDetail | null; governor: MunicipalDetail | null; loading: boolean };
 
-function OfficeResult({ title, detail }: { title: string; detail: MunicipalDetail | null }) {
+export function OfficeResult({ title, detail }: { title: string; detail: MunicipalDetail | null }) {
   return (
     <div className="muni-office">
       <h4>{title}</h4>
