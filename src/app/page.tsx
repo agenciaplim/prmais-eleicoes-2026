@@ -1,9 +1,11 @@
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { Hero } from "@/components/Hero";
+import { LiveCoverage, TvMode } from "@/components/LiveBlocks";
 import { OfficeCard, PresidentCard, TurnoutCard } from "@/components/results/ResultCards";
 import { ResultTabs } from "@/components/ResultTabs";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { liveEmbed } from "@/lib/live";
 import { loadHomeResults } from "@/lib/tse/home-results";
 import { buildHeroStatus } from "@/lib/ui/hero-status";
 
@@ -22,6 +24,7 @@ function MapPlaceholder() {
 
 export default async function Home() {
   const results = await loadHomeResults();
+  const live = liveEmbed();
   const presidentBr = results.presidentBr;
   const hero = buildHeroStatus(presidentBr.source, presidentBr.source === "unavailable" ? null : presidentBr.data);
 
@@ -90,15 +93,13 @@ export default async function Home() {
           </section>
 
           <aside>
-            <article className="card">
-              <h2>Cobertura ao vivo</h2>
-              <div className="placeholder">Embed configurável da transmissão</div>
-            </article>
+            <LiveCoverage embed={live} />
             <article className="card"><h2>Últimas atualizações</h2><p className="muted">Aguardando integração TSE.</p></article>
             <article className="card">
               <h2>Buscar município</h2>
               <input aria-label="Buscar município" placeholder="Digite o nome do município..." />
             </article>
+            <TvMode embed={live} />
           </aside>
         </div>
       </main>

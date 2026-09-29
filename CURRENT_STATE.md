@@ -214,3 +214,12 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - arquivos: `src/app/page.tsx`, `src/components/{Hero,AutoRefresh,ResultTabs}.tsx`, `src/components/results/*`, `src/lib/tse/home-results.ts`, `src/lib/ui/format.ts`, `src/app/globals.css`, `tests/web-results.test.ts`;
 - validação: 80 testes, typecheck e build passam; página conferida com fixtures em desktop e mobile, incluindo troca de abas e hash;
 - limite: sem acesso ao TSE a partir do ambiente do agente; a conferência visual usou fixtures só numa cópia temporária, fora do repositório.
+
+## Handoff WEB-008
+
+- feito: bloco "Cobertura ao vivo" (sidebar, com indicador "Ao vivo" e link "Assistir no YouTube") e bloco "Modo TV / OBS" com o mesmo embed em 16:9, conforme decisão;
+- configuração: `LIVE_PROVIDER=youtube` + `LIVE_EMBED_URL` aceitando watch, youtu.be, /live/, /embed/ e `embed/live_stream?channel=UC…`;
+- segurança: a URL informada nunca é usada diretamente; o id do vídeo/canal é validado por regex e o iframe é reconstruído em `youtube-nocookie.com`, com `loading="lazy"` e `referrerPolicy`; outro provedor, host, protocolo ou id inválido desliga o embed e mostra "Transmissão em breve";
+- arquivos: `src/lib/live.ts`, `src/components/LiveBlocks.tsx`, `src/app/page.tsx`, `src/app/globals.css`, `.env.example`, `docs/PROJECT.md`, `tests/live.test.ts`;
+- validação: 83 testes e typecheck passam; blocos conferidos por screenshot;
+- pendente: ao configurar CSP em produção (OPS), liberar `frame-src https://www.youtube-nocookie.com`.

@@ -91,7 +91,7 @@ A primeira hipótese operacional é Instagram, mas o componente não deve depend
 Variáveis previstas:
 
 ```env
-LIVE_PROVIDER=instagram
+LIVE_PROVIDER=youtube
 LIVE_EMBED_URL=
 ```
 
