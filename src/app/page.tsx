@@ -7,12 +7,23 @@ import { OfficeCard, PresidentCard, TurnoutCard } from "@/components/results/Res
 import { ResultTabs } from "@/components/ResultTabs";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { UpdatesCard } from "@/components/UpdatesCard";
+import { getCache } from "@/lib/cache";
 import { liveEmbed } from "@/lib/live";
 import { loadHomeResults } from "@/lib/tse/home-results";
+import { readUpdates, type UpdateItem } from "@/lib/tse/updates";
 import { buildHeroStatus } from "@/lib/ui/hero-status";
 
 // Re-render at most every 15s from our cache; AutoRefresh pulls new renders every 30s.
 export const revalidate = 15;
+
+async function loadUpdates(): Promise<UpdateItem[]> {
+  try {
+    return await readUpdates(await getCache());
+  } catch {
+    return [];
+  }
+}
 
 function MapCard() {
   return (
@@ -25,7 +36,7 @@ function MapCard() {
 }
 
 export default async function Home() {
-  const results = await loadHomeResults();
+  const [results, updates] = await Promise.all([loadHomeResults(), loadUpdates()]);
   const live = liveEmbed();
   const presidentBr = results.presidentBr;
   const hero = buildHeroStatus(presidentBr.source, presidentBr.source === "unavailable" ? null : presidentBr.data);
@@ -96,7 +107,7 @@ export default async function Home() {
 
           <aside>
             <LiveCoverage embed={live} />
-            <article className="card"><h2>Últimas atualizações</h2><p className="muted">Aguardando integração TSE.</p></article>
+            <UpdatesCard items={updates} />
             <article className="card">
               <h2>Buscar município</h2>
               <MunicipalitySearch />

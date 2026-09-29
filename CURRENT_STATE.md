@@ -251,3 +251,13 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - arquivos: `src/components/PrMap.tsx`, `src/lib/ui/map-colors.ts`, `scripts/build-pr-map.py`, `public/maps/pr-municipios.json`, `src/app/page.tsx`, `src/app/globals.css`, `tests/web-map.test.ts`;
 - validação: 93 testes e typecheck passam; mapa conferido no navegador com dados de fixture;
 - pendente (WEB-013): seletor "Selecione uma região" do wireframe; a API do IBGE com a relação município → região não é acessível a partir do ambiente do agente.
+
+## Handoff API-003
+
+- feito: "Últimas atualizações" geradas automaticamente pelo coletor a partir da comparação entre o snapshot anterior e o promovido (`deriveUpdates`);
+- eventos: marcos de apuração (10, 25, 50, 60, 75, 90, 95%) do Presidente no Brasil e do Governador no Paraná, primeiro líder e troca de liderança nos cargos majoritários, e resultado final (eleito, 2º turno ou apuração encerrada); comparação reiniciada quando a fase muda (simulado → oficial);
+- armazenamento: lista `updates:v1` com até 30 itens, ordenada pelo horário do TSE, com id idempotente (reexecuções não duplicam); falha ao gravar não afeta a coleta;
+- `promoteLastKnownGood` passa a devolver também `previous`;
+- interface: `UpdatesCard` com horário de Brasília, 5 itens visíveis e "Ver todas as atualizações";
+- arquivos: `src/lib/tse/updates.ts`, `src/lib/tse/last-known-good.ts`, `src/lib/tse/collector.ts`, `src/components/UpdatesCard.tsx`, `src/app/page.tsx`, `src/app/globals.css`, `tests/tse-updates.test.ts`, `tests/tse-collector.test.ts`;
+- validação: 97 testes e typecheck passam; bloco conferido no navegador.

@@ -9,6 +9,7 @@ import {
   type TseFileRequest
 } from "./client";
 import { promoteLastKnownGood } from "./last-known-good";
+import { appendUpdates, deriveUpdates, type UpdateItem } from "./updates";
 import { normalizeEa12Catalog, promoteLocationCatalog, readLocationCatalog } from "./location-catalog";
 import { collectMunicipalResults, type MunicipalCollectionReport } from "./municipal-results";
 import { normalizeEa20, TseNormalizationError } from "./normalizer";
@@ -221,6 +222,7 @@ export async function collectElectionResults(options: {
     catalog = { status: "failed", errorCode: errorCode(error) };
   }
 
+  const updates: UpdateItem[] = [];
   for (const target of collectionTargets(discovery, options.config.uf)) {
     try {
       const request: Extract<TseFileRequest, { kind: "EA20" }> = {
@@ -238,6 +240,7 @@ export async function collectElectionResults(options: {
       }
 
       const promotion = await promoteLastKnownGood(options.cache, result, now);
+      if (promotion.promoted) updates.push(...deriveUpdates(promotion.previous?.data ?? null, promotion.snapshot.data));
       items.push({
         office: target.office,
         scope: target.scopeLabel,
@@ -247,6 +250,12 @@ export async function collectElectionResults(options: {
     } catch (error) {
       items.push({ office: target.office, scope: target.scopeLabel, status: "failed", errorCode: errorCode(error) });
     }
+  }
+
+  try {
+    await appendUpdates(options.cache, updates);
+  } catch {
+    // Updates are editorial extras; a failure here never affects results.
   }
 
   const municipal: MunicipalCollectionReport[] = [];

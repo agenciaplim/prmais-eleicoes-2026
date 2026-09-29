@@ -39,7 +39,7 @@ Legenda:
 - [x] TSE-010 Coletar e expor resultados dos 399 municípios do Paraná (mapa e busca) — Claude (`cloud/tse-municipal`)
 - [x] TSE-011 Expor votação por partido/federação nos cargos proporcionais — Claude (`cloud/tse-party-groups`)
 - [ ] TSE-012 Coletar fotos oficiais dos candidatos server-side e servi-las pela nossa origem
-- [ ] API-003 Gerar "Últimas atualizações" automaticamente a partir dos snapshots
+- [x] API-003 Gerar "Últimas atualizações" automaticamente a partir dos snapshots — Claude (`cloud/api-updates`)
 
 ## Interface
 

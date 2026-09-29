@@ -29,6 +29,7 @@ export type LastKnownGoodSnapshot = z.infer<typeof snapshotSchema>;
 export type PromotionResult = {
   promoted: boolean;
   snapshot: LastKnownGoodSnapshot;
+  previous: LastKnownGoodSnapshot | null;
 };
 
 export function electionResultCacheKey(identity: ElectionResultIdentity): string {
@@ -65,7 +66,7 @@ export async function promoteLastKnownGood(
   const current = await readLastKnownGood(cache, identity);
 
   if (current && isRegression(current.data, data)) {
-    return { promoted: false, snapshot: current };
+    return { promoted: false, snapshot: current, previous: current };
   }
 
   const snapshot: LastKnownGoodSnapshot = {
@@ -75,5 +76,5 @@ export async function promoteLastKnownGood(
   };
 
   await cache.set(electionResultCacheKey(identity), snapshot);
-  return { promoted: true, snapshot };
+  return { promoted: true, snapshot, previous: current };
 }

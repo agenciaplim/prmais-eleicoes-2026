@@ -13,6 +13,7 @@ import {
 import { readLastKnownGood } from "../src/lib/tse/last-known-good";
 import { readLocationCatalog } from "../src/lib/tse/location-catalog";
 import { parseTseJson } from "../src/lib/tse/parser";
+import { readUpdates } from "../src/lib/tse/updates";
 import type { Ea11Payload, Ea12Payload, Ea20Payload } from "../src/lib/tse/schemas";
 
 async function fixture(name: string): Promise<string> {
@@ -145,7 +146,11 @@ test("collects and promotes all six first-round aggregate targets", async () => 
     { kind: "EA12", cycle: "ele2026", electionId: "21272" }
   );
 
+  const updates = await readUpdates(cache);
+  assert.ok(updates.length > 0);
+
   const repeated = await collectElectionResults({ client, cache, config: { uf: "pr", round: "1" } });
+  assert.deepEqual(await readUpdates(cache), updates);
   assert.equal(repeated.catalog.status, "unchanged");
   assert.equal(repeated.items.every((item) => item.status === "unchanged"), true);
 });

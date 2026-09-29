@@ -141,6 +141,10 @@ h3 { font-size: 15px; }
 .map-detail h3 { margin-bottom: 0; }
 .map-source { margin: 8px 0 0; font-size: 11px; color: var(--prmais-muted); }
 
+.updates { list-style: none; margin: 0; padding: 0; }
+.updates li { display: grid; grid-template-columns: 44px 1fr; gap: 8px; padding: 8px 0; border-top: 1px solid var(--prmais-bege); font-size: 14px; }
+.updates time { font-weight: 800; color: var(--prmais-azul); font-variant-numeric: tabular-nums; }
+
 input { width: 100%; padding: 10px 12px; border: 2px solid var(--prmais-bege); border-radius: 8px; background: var(--prmais-superficie); }
 input:focus { border-color: var(--prmais-azul); }
 
