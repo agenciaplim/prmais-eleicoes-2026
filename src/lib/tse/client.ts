@@ -427,7 +427,24 @@ export function createTseClient(config: TseClientConfig, fetchImplementation: Fe
     request: Extract<TseFileRequest, { kind: K }>
   ): Promise<TsePayloadByKind[K]> {
     const url = buildUrl(request);
-    const timeoutSignal = AbortSignal.timeout(normalizedConfig.timeoutMs);
+    // AbortSignal.timeout() uses an unref'd timer that does not keep the event loop alive,
+    // so a stalled request without active I/O would never time out. Use a referenced timer.
+    const controller = new AbortController();
+    const timeoutSignal = controller.signal;
+    const timer = setTimeout(() => controller.abort(new DOMException("TSE request timed out", "TimeoutError")), normalizedConfig.timeoutMs);
+
+    try {
+      return await fetchWithinTimeout(request, url, timeoutSignal);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function fetchWithinTimeout<K extends TsePayloadKind>(
+    request: Extract<TseFileRequest, { kind: K }>,
+    url: URL,
+    timeoutSignal: AbortSignal
+  ): Promise<TsePayloadByKind[K]> {
     let response: Response;
 
     try {

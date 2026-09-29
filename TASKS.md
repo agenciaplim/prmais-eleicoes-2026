@@ -22,6 +22,7 @@ Legenda:
 - [x] TSE-006 Implementar last-known-good — Codex (`codex/tse-schemas`)
 - [x] TSE-007 Adicionar validação JWS quando aplicável — Codex (`codex/tse-schemas`)
 - [x] TSE-008 Orquestrar descoberta e coleta server-side — Codex (`codex/tse-schemas`)
+- [x] TSE-009 Garantir disparo do timeout do fetch TSE mesmo sem I/O pendente — Claude (`cloud/tse-timeout-timer`)
 
 ## Cache
 

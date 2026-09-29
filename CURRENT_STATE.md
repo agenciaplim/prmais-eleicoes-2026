@@ -18,6 +18,7 @@
 - cliente server-side constrói e busca EA11, EA12, EA14, EA15 e EA20 com allowlist, timeout, limite de bytes e conferência requisição/payload;
 - snapshots eleitorais válidos são mantidos em last-known-good versionado, sem expiração automática;
 - modo JWS obrigatório verifica EdDSA/Ed25519, `kid` e assinatura com as chaves públicas oficiais de cada ambiente.
+- timeout do fetch TSE usa timer referenciado e dispara mesmo quando a requisição trava sem I/O pendente.
 - adaptador Upstash Redis disponível com configuração validada e cache em memória isolado e restrito ao desenvolvimento.
 - coletor server-side descobre eleições pelo EA11 e promove seis resultados agregados, acionado apenas por rota interna autenticada.
 - catálogo EA12 versionado armazena as 27 UFs e seus municípios e é exposto por `/api/locations` sem fetch público.
@@ -142,3 +143,11 @@ Aplicar a identidade visual real do PR+ na interface (WEB-001), consumindo somen
 - resiliência: falha do catálogo é isolada no relatório e não impede a promoção dos resultados eleitorais; a rota pública nunca consulta o TSE;
 - validação: 68 testes, typecheck e build passam; a prova assinada no simulado normalizou 27 UFs, 5.571 municípios e os 399 municípios do Paraná;
 - falta: aplicar a identidade visual do PR+ e conectar a interface às APIs internas.
+
+## Handoff TSE-009
+
+- feito: `fetchPayload` troca `AbortSignal.timeout()` por `AbortController` + `setTimeout` referenciado, limpo em `finally` após fetch, leitura, verificação JWS e parse;
+- motivo: o timer de `AbortSignal.timeout()` não mantém o event loop do Node ativo; uma requisição parada sem socket aberto nunca expirava e 5 testes de `tse-client` eram cancelados (`Promise resolution is still pending`) no Node 22.23;
+- arquivos alterados: `src/lib/tse/client.ts`, `CURRENT_STATE.md` e `TASKS.md`;
+- validação: 68 testes (0 cancelados), typecheck e build passam; build executado em cópia fora da pasta montada, pois o ambiente do agente não pode apagar `.next/`;
+- falta: nenhuma tarefa TSE pendente; próxima prioridade segue WEB-001.
