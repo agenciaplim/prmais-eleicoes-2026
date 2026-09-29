@@ -284,3 +284,13 @@ Integrar as branches `cloud/*` e fazer uma coleta real no simulado a partir do M
 
 Branches criadas em sequência, cada uma a partir da anterior, então `cloud/web-mobile` contém todo o trabalho:
 `cloud/tse-timeout-timer` → `cloud/web-identity` → `cloud/web-hero` → `cloud/tse-party-groups` → `cloud/web-header-footer` → `cloud/web-results` → `cloud/web-live` → `cloud/tse-municipal` → `cloud/web-municipality-search` → `cloud/web-map` → `cloud/api-updates` → `cloud/tse-photos` → `cloud/web-mobile`.
+
+## Handoff OPS (preparação, sem deploy)
+
+- feito: CSP, HSTS e cache de `/maps` em `next.config.ts` (só produção); conferido no build de produção com Playwright: zero violações de CSP, abas e mapa funcionando;
+- robustez: rotas públicas (`results`, `locations`, `municipalities`, `photos`) respondem 503 `no-store` quando o cache está inacessível ou mal configurado, em vez de 500; teste `tests/api-cache-unavailable.test.ts`;
+- coletor: `vercel.json` com cron a cada minuto e `maxDuration = 60` na rota interna; `CRON_SECRET` deve ter o mesmo valor de `COLLECTOR_SECRET`;
+- scripts: `pnpm check:simulado` (coleta completa no simulado com cache em memória, imprime agregados, municípios, agremiações, foto e atualizações) e `pnpm load-test <url> <s> <clientes>` (sem dependências);
+- documentação: `docs/DEPLOY.md` com o roteiro OPS-001 a OPS-007;
+- validação: 101 testes, typecheck e build passam (na cópia da nuvem); teste de carga local sem CDN: ~470 req/s com 200 clientes, zero erros de rede — valor indicativo, o teste real é contra o deploy;
+- risco: o projeto está em `~/Documents` sincronizado pelo iCloud, que removeu arquivos de `node_modules` do disco e criou cópias `* 2`; mover a pasta antes de continuar.

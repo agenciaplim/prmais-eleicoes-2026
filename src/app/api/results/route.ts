@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cacheUnavailable } from "@/lib/cache/unavailable";
 import { loadPublicResult } from "@/lib/tse/public-result-loader";
 import { parsePublicResultQuery } from "@/lib/tse/public-results";
 
@@ -11,7 +12,12 @@ export async function GET(request: Request) {
     );
   }
 
-  const result = await loadPublicResult(query.identity, query.isDefault);
+  let result: Awaited<ReturnType<typeof loadPublicResult>>;
+  try {
+    result = await loadPublicResult(query.identity, query.isDefault);
+  } catch (error) {
+    return cacheUnavailable("results", error);
+  }
 
   if (result.source === "unavailable") {
     return NextResponse.json(

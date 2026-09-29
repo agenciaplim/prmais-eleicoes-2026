@@ -6,6 +6,8 @@ import { TsePayloadError } from "@/lib/tse/parser";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Aggregates + photos + two municipal batches (TSE_MUNICIPAL_BUDGET_MS each) must fit here.
+export const maxDuration = 60;
 
 function safeErrorCode(error: unknown): string {
   if (error instanceof TseCollectorError) return `collector:${error.code}`;

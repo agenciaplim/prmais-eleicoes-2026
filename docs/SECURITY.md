@@ -80,6 +80,10 @@ Retry deve ter limite e backoff.
 
 Na produção, configurar HTTPS, CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy` e proteções de edge/WAF disponíveis.
 
+### 10.1 Aplicado no código
+
+CSP restrita à própria origem (exceto o iframe `youtube-nocookie.com` e o envio da busca para `prmais.com`), HSTS e demais headers em `next.config.ts`, somente em produção. Rotas públicas respondem `503` sem detalhes quando o cache está indisponível.
+
 ### 11. Rate limit
 
 Aplicar rate limiting nos endpoints públicos quando a hospedagem estiver definida.

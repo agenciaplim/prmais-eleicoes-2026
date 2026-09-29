@@ -63,6 +63,6 @@ Legenda:
 - [ ] OPS-002 Criar Upstash Redis
 - [ ] OPS-003 Configurar variáveis de produção
 - [ ] OPS-004 Configurar domínio `eleicoes.prmais`
-- [ ] OPS-005 Adicionar rate limiting/WAF conforme ambiente final
-- [ ] OPS-006 Teste de carga básico
+- [>] OPS-005 Adicionar rate limiting/WAF conforme ambiente final — headers/CSP e 503 feitos; falta regra no Firewall da Vercel
+- [>] OPS-006 Teste de carga básico — script `pnpm load-test` pronto; falta rodar contra o deploy
 - [ ] OPS-007 Ensaio da apuração antes do dia da eleição

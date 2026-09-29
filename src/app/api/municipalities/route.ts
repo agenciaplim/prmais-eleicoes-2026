@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCache } from "@/lib/cache";
+import { cacheUnavailable } from "@/lib/cache/unavailable";
 import { readMunicipalSummary } from "@/lib/tse/municipal-results";
 import { municipalEntry, municipalOverview, parsePublicMunicipalQuery } from "@/lib/tse/public-municipal";
 
@@ -12,7 +13,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "invalid municipalities query", code: query.code }, { status: 400, headers: noStore });
   }
 
-  const summary = await readMunicipalSummary(await getCache(), query.office, UF);
+  let summary: Awaited<ReturnType<typeof readMunicipalSummary>>;
+  try {
+    summary = await readMunicipalSummary(await getCache(), query.office, UF);
+  } catch (error) {
+    return cacheUnavailable("municipalities", error);
+  }
   if (!summary) return NextResponse.json({ error: "results unavailable" }, { status: 503, headers: noStore });
 
   const body = query.code ? municipalEntry(summary, query.code) : { office: query.office, items: municipalOverview(summary) };

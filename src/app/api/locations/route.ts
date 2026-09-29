@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCache } from "@/lib/cache";
+import { cacheUnavailable } from "@/lib/cache/unavailable";
 import { readLocationCatalog } from "@/lib/tse/location-catalog";
 import { parsePublicLocationQuery, publicLocationPayload } from "@/lib/tse/public-locations";
 
@@ -12,7 +13,12 @@ export async function GET(request: Request) {
     );
   }
 
-  const snapshot = await readLocationCatalog(await getCache());
+  let snapshot: Awaited<ReturnType<typeof readLocationCatalog>>;
+  try {
+    snapshot = await readLocationCatalog(await getCache());
+  } catch (error) {
+    return cacheUnavailable("locations", error);
+  }
   if (!snapshot) {
     return NextResponse.json(
       { error: "locations unavailable" },

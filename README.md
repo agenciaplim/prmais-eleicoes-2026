@@ -78,6 +78,10 @@ UPSTASH_REDIS_REST_TOKEN=...
 
 Em produção, `CACHE_DRIVER=upstash` e ambas as credenciais são obrigatórios. O cache em memória é recusado para evitar perda silenciosa do last-known-good entre instâncias ou reinicializações.
 
+## Deploy
+
+Ver `docs/DEPLOY.md` (simulado, Upstash, Vercel, cron, domínio, proteção, carga e ensaio).
+
 ## Antes de trabalhar
 
 Codex e Cloud Code devem ler nesta ordem:

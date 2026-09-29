@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "test": "tsx --test tests/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:simulado": "tsx scripts/check-simulado.ts",
+    "load-test": "node scripts/load-test.mjs"
   },
   "dependencies": {
     "@upstash/redis": "^1.35.0",
