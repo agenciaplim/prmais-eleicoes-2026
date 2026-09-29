@@ -107,3 +107,23 @@ A identidade visual utilizada será a do PR+.
 **Motivo:** a paleta vem diretamente das quatro variantes oficiais da logo; trocar a tipografia ou ajustar cores exige alterar apenas os tokens.
 
 **Limite:** verde (`#0BDB15`) e laranja (`#FF6C00`) não têm contraste suficiente como texto sobre branco e só devem ser usados sobre azul ou como fundo de elementos com texto escuro.
+
+---
+
+## 2026-09-28 — Definições do template a partir do wireframe
+
+**Decisões (confirmadas pelo usuário):**
+
+- tipografia: manter pilha de fontes do sistema; sem fonte externa;
+- slogan do header: "O Paraná em tempo real";
+- menu do header: seções reais do prmais.com (Home, Plantão PR Mais, Agenda Pública, Cidadania, Educação, Economia, Na cancha, Palco Cultural, Partiu!) com links para o portal;
+- busca de notícias: envia para a busca do portal (`https://prmais.com/?s=<termo>`, padrão WordPress); ícone de usuário removido, pois não há autenticação própria;
+- hero: sem foto de fundo, apenas azul PR+;
+- rodapé: redes do portal — Facebook, Instagram, X, WhatsApp e TikTok (o portal não publica link de YouTube);
+- transmissão: embed do YouTube configurado por `LIVE_PROVIDER=youtube` e `LIVE_EMBED_URL`; aceitar apenas URLs de embed do YouTube;
+- selo "Apuração ao vivo": laranja PR+ com texto escuro, em vez do vermelho do wireframe;
+- fotos dos candidatos: fotos oficiais do TSE, coletadas server-side pelo coletor e servidas a partir do nosso cache/origem, nunca buscadas pelo browser no TSE;
+- "Últimas atualizações": geradas automaticamente dos snapshots do TSE (marcos de % apurado, mudança de liderança, totalização), sem painel editorial;
+- "Modo TV / OBS": bloco com o mesmo embed da live em 16:9, sem rota nova.
+
+**Motivo:** fechar as lacunas entre o wireframe e o portal real sem adicionar infraestrutura fora do escopo do `PROJECT.md`.

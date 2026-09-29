@@ -165,3 +165,10 @@ Implementar o hero com status real de apuração (WEB-002) e as abas (WEB-003), 
 - pendente: tipografia oficial do PR+ não foi fornecida e não pôde ser obtida do portal; os tokens `--font-display`/`--font-body` usam pilha de sistema (WEB-010);
 - pendente: `docs/reference/wireframe-prmais-eleicoes.png` citado em `docs/WIREFRAME.md` não existe no repositório (WEB-011);
 - nota: a pasta `assets/` com as artes originais não está versionada; decidir se entra no Git.
+
+## Handoff — definições do wireframe
+
+- feito: wireframe aprovado salvo em `docs/reference/wireframe-prmais-eleicoes.png`; lacunas entre wireframe e portal decididas com o usuário e registradas em `docs/DECISIONS.md`;
+- novas tarefas: TSE-010 (resultados por município), TSE-011 (votos por partido), TSE-012 (fotos TSE), API-003 (atualizações automáticas) e WEB-012 (header/rodapé do portal);
+- risco: fotos do TSE exigem nova origem allowlisted no coletor e armazenamento; avaliar tamanho no Upstash antes de implementar;
+- próximo: WEB-002 e WEB-003, que já podem consumir `/api/results`.

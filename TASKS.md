@@ -34,6 +34,13 @@ Legenda:
 - [x] API-001 Expor resultados por cargo e abrangência a partir do cache — Codex (`codex/tse-schemas`)
 - [x] API-002 Expor catálogo de municípios e estados — Codex (`codex/tse-schemas`)
 
+## Dados adicionais (wireframe)
+
+- [ ] TSE-010 Coletar e expor resultados dos 399 municípios do Paraná (mapa e busca)
+- [ ] TSE-011 Expor votação por partido/federação nos cargos proporcionais
+- [ ] TSE-012 Coletar fotos oficiais dos candidatos server-side e servi-las pela nossa origem
+- [ ] API-003 Gerar "Últimas atualizações" automaticamente a partir dos snapshots
+
 ## Interface
 
 - [x] WEB-001 Aplicar identidade visual real do PR+ — Claude (`cloud/web-identity`)
@@ -43,9 +50,10 @@ Legenda:
 - [ ] WEB-005 Implementar Governador / Senado / Deputados
 - [ ] WEB-006 Implementar busca dos 399 municípios
 - [ ] WEB-007 Implementar mapa do Paraná
-- [ ] WEB-008 Implementar bloco de transmissão ao vivo configurável
+- [ ] WEB-008 Implementar bloco de transmissão ao vivo configurável (YouTube) e bloco Modo TV/OBS
+- [ ] WEB-012 Header com menu do prmais.com, slogan e busca; rodapé com redes do portal
 - [ ] WEB-009 Implementar versão mobile conforme wireframe
-- [ ] WEB-010 Aplicar tipografia oficial do PR+ (aguarda definição da fonte)
+- [x] WEB-010 Definir tipografia — decisão: manter fonte do sistema
 - [x] WEB-011 Adicionar `docs/reference/wireframe-prmais-eleicoes.png` ao repositório — Claude (`cloud/web-identity`)
 
 ## Operação
