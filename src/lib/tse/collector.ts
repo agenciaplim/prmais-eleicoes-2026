@@ -9,7 +9,8 @@ import {
   type TseFileRequest
 } from "./client";
 import { promoteLastKnownGood } from "./last-known-good";
-import { normalizeEa12Catalog, promoteLocationCatalog } from "./location-catalog";
+import { normalizeEa12Catalog, promoteLocationCatalog, readLocationCatalog } from "./location-catalog";
+import { collectMunicipalResults, type MunicipalCollectionReport } from "./municipal-results";
 import { normalizeEa20, TseNormalizationError } from "./normalizer";
 import { TsePayloadError } from "./parser";
 import type { Ea11Payload, Ea12Payload, Ea20Payload } from "./schemas";
@@ -21,6 +22,8 @@ export type CollectorConfig = {
   uf: string;
   round: "1" | "2";
   eventId?: string;
+  // Time budget per municipal office; 0 disables municipal collection.
+  municipalBudgetMs?: number;
 };
 
 export type DiscoveredElections = {
@@ -49,6 +52,7 @@ export type CollectionReport = {
     errorCode?: string;
   };
   items: CollectionItem[];
+  municipal: MunicipalCollectionReport[];
 };
 
 export class TseCollectorError extends Error {
@@ -245,7 +249,34 @@ export async function collectElectionResults(options: {
     }
   }
 
-  return { startedAt, finishedAt: now().toISOString(), discovery, catalog, items };
+  const municipal: MunicipalCollectionReport[] = [];
+  const budgetMs = options.config.municipalBudgetMs ?? 0;
+  if (budgetMs > 0) {
+    const catalogSnapshot = await readLocationCatalog(options.cache);
+    const state = catalogSnapshot?.data.states.find((item) => item.code === options.config.uf.toUpperCase());
+    if (state) {
+      const targets = [
+        { office: "president", officeCode: "1", electionId: discovery.federalElectionId },
+        { office: "governor", officeCode: "3", electionId: discovery.stateElectionId }
+      ] as const;
+      for (const target of targets) {
+        municipal.push(
+          await collectMunicipalResults({
+            client: options.client,
+            cache: options.cache,
+            ...target,
+            cycle: discovery.cycle,
+            uf: options.config.uf,
+            municipalities: state.municipalities,
+            budgetMs,
+            now
+          })
+        );
+      }
+    }
+  }
+
+  return { startedAt, finishedAt: now().toISOString(), discovery, catalog, items, municipal };
 }
 
 export function collectorConfigFromEnv(env: Readonly<Record<string, string | undefined>> = process.env): CollectorConfig {
@@ -263,7 +294,12 @@ export function collectorConfigFromEnv(env: Readonly<Record<string, string | und
     throw new TseCollectorError("INVALID_CONFIG", "TSE_PLEITO_ID must be a numeric identifier");
   }
 
-  return { uf: uf.toLowerCase(), round, eventId };
+  const budget = env.TSE_MUNICIPAL_BUDGET_MS ?? "20000";
+  if (!/^\d{1,6}$/.test(budget) || Number(budget) > 50_000) {
+    throw new TseCollectorError("INVALID_CONFIG", "TSE_MUNICIPAL_BUDGET_MS must be between 0 and 50000");
+  }
+
+  return { uf: uf.toLowerCase(), round, eventId, municipalBudgetMs: Number(budget) };
 }
 
 export async function collectElectionResultsFromEnv(): Promise<CollectionReport> {

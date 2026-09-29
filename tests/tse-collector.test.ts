@@ -178,7 +178,10 @@ test("validates collector environment settings", () => {
   assert.deepEqual(collectorConfigFromEnv({ TSE_UF: "PR", TSE_ROUND: "1", TSE_PLEITO_ID: "17801" }), {
     uf: "pr",
     round: "1",
-    eventId: "17801"
+    eventId: "17801",
+    municipalBudgetMs: 20000
   });
+  assert.equal(collectorConfigFromEnv({ TSE_UF: "PR", TSE_ROUND: "1", TSE_MUNICIPAL_BUDGET_MS: "0" }).municipalBudgetMs, 0);
   assert.throws(() => collectorConfigFromEnv({ TSE_UF: "PR", TSE_ROUND: "3" }), TseCollectorError);
+  assert.throws(() => collectorConfigFromEnv({ TSE_UF: "PR", TSE_ROUND: "1", TSE_MUNICIPAL_BUDGET_MS: "90000" }), TseCollectorError);
 });

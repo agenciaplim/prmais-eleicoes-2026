@@ -135,3 +135,15 @@ A identidade visual utilizada será a do PR+.
 **Decisão:** as abas alternam painéis no cliente (hash na URL), sem nova requisição: Paraná (visão do wireframe), Presidente (rankings completos BR e PR), Brasil (Presidente nacional + participação) e Municípios (mapa e busca). A página inteira é atualizada por `router.refresh()` a cada 30s.
 
 **Motivo:** mantém a página em ISR (uma leitura de cache a cada 15s, independentemente do tráfego) e uma única requisição por cliente para atualizar todos os blocos, em vez de uma chamada por cargo.
+
+---
+
+## 2026-09-28 — Resultados por município
+
+**Decisão:** coletar Presidente e Governador para os 399 municípios do Paraná e armazenar um resumo por cargo em uma única chave (`results:municipal:v1:<cargo>:pr`), com os 5 primeiros de cada município, sem TTL.
+
+**Motivo:** mapa e busca precisam do líder e do top 5 por cidade; uma chave por cargo evita ~800 chaves e permite ler o mapa inteiro com uma leitura.
+
+**Resiliência:** last-known-good por município (falha ou regressão mantém a entrada anterior); cada execução tem orçamento de tempo e cursor rotativo, retomando de onde parou, para caber no limite de execução das funções serverless.
+
+**Limite:** outros cargos por município ficam fora do MVP.

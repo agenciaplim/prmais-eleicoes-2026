@@ -223,3 +223,13 @@ Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com res
 - arquivos: `src/lib/live.ts`, `src/components/LiveBlocks.tsx`, `src/app/page.tsx`, `src/app/globals.css`, `.env.example`, `docs/PROJECT.md`, `tests/live.test.ts`;
 - validação: 83 testes e typecheck passam; blocos conferidos por screenshot;
 - pendente: ao configurar CSP em produção (OPS), liberar `frame-src https://www.youtube-nocookie.com`.
+
+## Handoff TSE-010
+
+- feito: coleta de EA20 municipal para Presidente (eleição federal) e Governador (eleição estadual) nos municípios do catálogo EA12, com pool de 8 requisições, orçamento `TSE_MUNICIPAL_BUDGET_MS` (padrão 20s, máx. 50s, 0 desliga) e cursor rotativo;
+- armazenamento: resumo por cargo com top 5, % apurado, fase e horário por município; entrada anterior preservada em falha ou regressão; uma escrita por execução;
+- API: `/api/municipalities?office=president|governor` (lista com líder por município) e `&code=<TSE 5 dígitos>` (top 5 de um município); parâmetros fora da allowlist retornam 400, ausência de dados 503;
+- relatório do coletor ganhou `municipal[]` (tentados, atualizados, falhas, total), sem payloads;
+- arquivos: `src/lib/tse/municipal-results.ts`, `src/lib/tse/public-municipal.ts`, `src/app/api/municipalities/route.ts`, `src/lib/tse/collector.ts`, `.env.example`, `README.md`, testes;
+- validação: 88 testes e typecheck passam;
+- pendente: prova online no simulado (o ambiente do agente não acessa o TSE); medir no ensaio (OPS-007) quantos municípios cabem por execução e ajustar orçamento/frequência do coletor.

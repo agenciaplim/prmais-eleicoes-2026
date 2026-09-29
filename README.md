@@ -53,6 +53,15 @@ O catálogo de localidades também é cache-only. A consulta sem parâmetros ret
 
 O parâmetro `state` aceita uma única sigla minúscula. UFs ausentes no catálogo retornam `404`, e o catálogo ainda não coletado retorna `503`.
 
+Resultados por município (Presidente e Governador no Paraná), também cache-only:
+
+```text
+/api/municipalities?office=president              lista leve: líder e % apurado de cada município
+/api/municipalities?office=governor&code=75353    um município (código TSE de 5 dígitos), top 5
+```
+
+O coletor busca os municípios em lotes: cada execução usa até `TSE_MUNICIPAL_BUDGET_MS` por cargo e continua de onde parou na execução seguinte.
+
 Quando o Upstash estiver configurado, altere:
 
 ```env
