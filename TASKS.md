@@ -51,7 +51,7 @@ Legenda:
 - [ ] WEB-006 Implementar busca dos 399 municípios
 - [ ] WEB-007 Implementar mapa do Paraná
 - [ ] WEB-008 Implementar bloco de transmissão ao vivo configurável (YouTube) e bloco Modo TV/OBS
-- [ ] WEB-012 Header com menu do prmais.com, slogan e busca; rodapé com redes do portal
+- [x] WEB-012 Header com menu do prmais.com, slogan e busca; rodapé com redes do portal — Claude (`cloud/web-header-footer`)
 - [ ] WEB-009 Implementar versão mobile conforme wireframe
 - [x] WEB-010 Definir tipografia — decisão: manter fonte do sistema
 - [x] WEB-011 Adicionar `docs/reference/wireframe-prmais-eleicoes.png` ao repositório — Claude (`cloud/web-identity`)

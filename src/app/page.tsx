@@ -1,4 +1,5 @@
-import { BrandLogo } from "@/components/BrandLogo";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { LiveHero } from "@/components/LiveHero";
 import { loadPublicResult } from "@/lib/tse/public-result-loader";
 import { buildHeroStatus, type HeroStatus } from "@/lib/ui/hero-status";
@@ -29,14 +30,7 @@ export default async function Home() {
 
   return (
     <>
-      <header className="header">
-        <div className="shell header-inner">
-          <a href="/" aria-label="PR Mais — início">
-            <BrandLogo height={40} priority />
-          </a>
-          <span className="tag">Eleições 2026</span>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="shell">
         <LiveHero initial={hero} />
@@ -91,12 +85,7 @@ export default async function Home() {
         </div>
       </main>
 
-      <footer className="footer">
-        <div className="shell footer-inner">
-          <BrandLogo variant="bege" height={32} />
-          <span>Fonte: TSE · PR+ Eleições 2026</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

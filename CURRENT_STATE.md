@@ -193,3 +193,11 @@ Implementar as abas Paraná / Presidente / Brasil / Municípios (WEB-003) e o ra
 - arquivos: `src/lib/tse/types.ts`, `normalizer.ts`, `result-schema.ts`, `mock.ts` e testes de normalizador/last-known-good;
 - validação: 79 testes e typecheck passam;
 - risco: confirmar no simulado oficial que `tvtn` já exclui votos anulados de partidos com `dvt=Anulado`.
+
+## Handoff WEB-012
+
+- feito: header com logo + slogan "O Paraná em tempo real", busca que envia para `https://prmais.com/?s=` e faixa de menu com as seções reais do portal; no mobile, menu e busca ficam num `<details>` sem JavaScript;
+- rodapé: logo bege, slogan, links das redes do portal (Facebook, Instagram, X, WhatsApp, TikTok) com `rel="noopener noreferrer"` e "Fonte: TSE";
+- configuração: links centralizados em `src/lib/site.ts`;
+- arquivos: `src/lib/site.ts`, `src/components/SiteHeader.tsx`, `src/components/SiteFooter.tsx`, `src/app/page.tsx`, `src/app/globals.css`;
+- validação: typecheck passa; conferido por screenshot em 1280px e 390px.
