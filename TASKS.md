@@ -45,9 +45,9 @@ Legenda:
 
 - [x] WEB-001 Aplicar identidade visual real do PR+ — Claude (`cloud/web-identity`)
 - [x] WEB-002 Implementar hero “Eleições 2026 / Apuração ao vivo” — Claude (`cloud/web-hero`)
-- [ ] WEB-003 Implementar abas Paraná / Presidente / Brasil / Municípios
-- [ ] WEB-004 Implementar ranking presidencial
-- [ ] WEB-005 Implementar Governador / Senado / Deputados
+- [x] WEB-003 Implementar abas Paraná / Presidente / Brasil / Municípios — Claude (`cloud/web-results`)
+- [x] WEB-004 Implementar ranking presidencial — Claude (`cloud/web-results`)
+- [x] WEB-005 Implementar Governador / Senado / Deputados — Claude (`cloud/web-results`)
 - [ ] WEB-006 Implementar busca dos 399 municípios
 - [ ] WEB-007 Implementar mapa do Paraná
 - [ ] WEB-008 Implementar bloco de transmissão ao vivo configurável (YouTube) e bloco Modo TV/OBS

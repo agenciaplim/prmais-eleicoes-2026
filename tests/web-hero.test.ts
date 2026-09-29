@@ -4,7 +4,7 @@ import { createMemoryCache } from "../src/lib/cache/memory";
 import { promoteLastKnownGood, type ElectionResultIdentity } from "../src/lib/tse/last-known-good";
 import { mockResult } from "../src/lib/tse/mock";
 import { loadPublicResult } from "../src/lib/tse/public-result-loader";
-import { buildHeroStatus, parseHeroResult, type HeroResult } from "../src/lib/ui/hero-status";
+import { buildHeroStatus, type HeroResult } from "../src/lib/ui/hero-status";
 
 const identity: ElectionResultIdentity = { scope: "BR", scopeType: "country", office: "president" };
 const now = new Date("2026-10-04T21:50:00-03:00");
@@ -46,14 +46,6 @@ test("shows a waiting state when results are unavailable", () => {
   const status = buildHeroStatus("unavailable", null, now);
   assert.equal(status.state, "unavailable");
   assert.equal(status.progressText, null);
-});
-
-test("rejects malformed API payloads", () => {
-  assert.deepEqual(parseHeroResult(mockResult), hero({ phase: "simulation", updatedAt: mockResult.updatedAt }));
-  assert.equal(parseHeroResult(null), null);
-  assert.equal(parseHeroResult({ ...mockResult, progress: 120 }), null);
-  assert.equal(parseHeroResult({ ...mockResult, status: "unknown" }), null);
-  assert.equal(parseHeroResult({ ...mockResult, updatedAt: "ontem" }), null);
 });
 
 test("loader serves cached snapshots before the mock", async () => {

@@ -23,7 +23,8 @@
 - coletor server-side descobre eleições pelo EA11 e promove seis resultados agregados, acionado apenas por rota interna autenticada.
 - catálogo EA12 versionado armazena as 27 UFs e seus municípios e é exposto por `/api/locations` sem fetch público.
 - identidade PR+ aplicada: logos oficiais em `public/brand/`, paleta em tokens CSS e componente `BrandLogo`.
-- hero exibe status real da apuração (ao vivo, encerrada, aguardando), horário de Brasília e % de seções, lido do cache e atualizado no cliente a cada 30s.
+- hero exibe status real da apuração (ao vivo, encerrada, aguardando), horário de Brasília e % de seções, lido do cache.
+- abas Paraná / Presidente / Brasil / Municípios com ranking presidencial, cards de Governador, Senado e Deputados e participação nacional, atualizados a cada 30s via `router.refresh()`.
 
 ## Em desenvolvimento
 
@@ -39,7 +40,7 @@
 
 ## Próxima prioridade
 
-Implementar as abas Paraná / Presidente / Brasil / Municípios (WEB-003) e o ranking presidencial (WEB-004), consumindo somente as APIs internas.
+Transmissão YouTube e Modo TV (WEB-008), busca de municípios (WEB-006) com resultados por município (TSE-010) e mapa (WEB-007).
 
 ## Handoff TSE-001
 
@@ -201,3 +202,15 @@ Implementar as abas Paraná / Presidente / Brasil / Municípios (WEB-003) e o ra
 - configuração: links centralizados em `src/lib/site.ts`;
 - arquivos: `src/lib/site.ts`, `src/components/SiteHeader.tsx`, `src/components/SiteFooter.tsx`, `src/app/page.tsx`, `src/app/globals.css`;
 - validação: typecheck passa; conferido por screenshot em 1280px e 390px.
+
+## Handoff WEB-003 / WEB-004 / WEB-005
+
+- abas: componente cliente `ResultTabs` (ARIA tablist) alterna painéis renderizados no servidor e guarda a aba no hash (`#parana`, `#presidente`, `#brasil`, `#municipios`); sem JS, o primeiro painel aparece;
+- conteúdo: Paraná = Presidente nacional (top 5) + bloco estadual (4 cargos, top 3) + mapa; Presidente = rankings completos Brasil e Paraná; Brasil = Presidente nacional + participação (comparecimento, abstenção, válidos, brancos, nulos); Municípios = mapa (placeholder até WEB-007);
+- ranking: posição, avatar com iniciais (fotos em TSE-012), nome de urna, partido, barra, %, votos e etiqueta de situação (Eleito, 2º turno, Eleito por QP…); excedentes em "Ver todos" via `<details>`;
+- deputados: usam `groups` (TSE-011) com sigla da federação/partido, % e vagas;
+- dados: `loadHomeResults` lê as seis identidades do cache em paralelo, isolando falhas por cargo ("Aguardando dados do TSE");
+- atualização: `AutoRefresh` chama `router.refresh()` a cada 30s com a aba visível, substituindo o polling do hero (removido `LiveHero`/`parseHeroResult`); a página continua ISR de 15s;
+- arquivos: `src/app/page.tsx`, `src/components/{Hero,AutoRefresh,ResultTabs}.tsx`, `src/components/results/*`, `src/lib/tse/home-results.ts`, `src/lib/ui/format.ts`, `src/app/globals.css`, `tests/web-results.test.ts`;
+- validação: 80 testes, typecheck e build passam; página conferida com fixtures em desktop e mobile, incluindo troca de abas e hash;
+- limite: sem acesso ao TSE a partir do ambiente do agente; a conferência visual usou fixtures só numa cópia temporária, fora do repositório.

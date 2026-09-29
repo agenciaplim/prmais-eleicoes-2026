@@ -127,3 +127,11 @@ A identidade visual utilizada será a do PR+.
 - "Modo TV / OBS": bloco com o mesmo embed da live em 16:9, sem rota nova.
 
 **Motivo:** fechar as lacunas entre o wireframe e o portal real sem adicionar infraestrutura fora do escopo do `PROJECT.md`.
+
+---
+
+## 2026-09-28 — Conteúdo das abas e atualização da página
+
+**Decisão:** as abas alternam painéis no cliente (hash na URL), sem nova requisição: Paraná (visão do wireframe), Presidente (rankings completos BR e PR), Brasil (Presidente nacional + participação) e Municípios (mapa e busca). A página inteira é atualizada por `router.refresh()` a cada 30s.
+
+**Motivo:** mantém a página em ISR (uma leitura de cache a cada 15s, independentemente do tráfego) e uma única requisição por cliente para atualizar todos os blocos, em vez de uma chamada por cargo.

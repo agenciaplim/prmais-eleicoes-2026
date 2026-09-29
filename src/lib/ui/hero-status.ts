@@ -1,4 +1,3 @@
-// Pure helpers shared by the server page and the client hero. No server-only imports here.
 
 export type HeroResult = {
   status: "not-started" | "in-progress" | "finished";
@@ -22,24 +21,6 @@ const TIME_ZONE = "America/Sao_Paulo";
 const timeFormat = new Intl.DateTimeFormat("pt-BR", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" });
 const dayFormat = new Intl.DateTimeFormat("pt-BR", { timeZone: TIME_ZONE, day: "2-digit", month: "2-digit" });
 const percentFormat = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-// Validates the subset of /api/results the hero needs; anything else keeps the previous state.
-export function parseHeroResult(input: unknown): HeroResult | null {
-  if (!input || typeof input !== "object") return null;
-  const value = input as Record<string, unknown>;
-  const statusOk = value.status === "not-started" || value.status === "in-progress" || value.status === "finished";
-  const phaseOk = value.phase === "simulation" || value.phase === "official";
-  const progressOk = typeof value.progress === "number" && Number.isFinite(value.progress) && value.progress >= 0 && value.progress <= 100;
-  const updatedOk = typeof value.updatedAt === "string" && !Number.isNaN(Date.parse(value.updatedAt));
-  if (!statusOk || !phaseOk || !progressOk || !updatedOk || typeof value.final !== "boolean") return null;
-  return {
-    status: value.status as HeroResult["status"],
-    phase: value.phase as HeroResult["phase"],
-    final: value.final,
-    progress: value.progress as number,
-    updatedAt: value.updatedAt as string
-  };
-}
 
 function formatUpdated(updatedAt: string, now: Date): string {
   const date = new Date(updatedAt);
