@@ -293,4 +293,5 @@ Branches criadas em sequência, cada uma a partir da anterior, então `cloud/web
 - scripts: `pnpm check:simulado` (coleta completa no simulado com cache em memória, imprime agregados, municípios, agremiações, foto e atualizações) e `pnpm load-test <url> <s> <clientes>` (sem dependências);
 - documentação: `docs/DEPLOY.md` com o roteiro OPS-001 a OPS-007;
 - validação: 101 testes, typecheck e build passam (na cópia da nuvem); teste de carga local sem CDN: ~470 req/s com 200 clientes, zero erros de rede — valor indicativo, o teste real é contra o deploy;
-- risco: o projeto está em `~/Documents` sincronizado pelo iCloud, que removeu arquivos de `node_modules` do disco e criou cópias `* 2`; mover a pasta antes de continuar.
+- resolvido (2026-10-01): projeto movido para `~/Projetos/prmais-eleicoes-starter`, fora do iCloud; `.git`, `.gitignore` e `.env.example` restaurados da pasta antiga; `git fsck` limpo; 101 testes, typecheck e build passam no Mac;
+- pendente: `node_modules` ainda traz cópias `* 2` do iCloud (inofensivas); rodar `rm -rf node_modules && pnpm install` quando conveniente; a pasta antiga em `~/Documents` pode ser apagada.
