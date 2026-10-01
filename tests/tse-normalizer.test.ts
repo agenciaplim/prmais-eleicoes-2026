@@ -167,3 +167,26 @@ test("keeps party groups empty for majoritarian offices", async () => {
   const [result] = normalizeEa20(await readEa20Fixture("ea20-president-br.json"));
   assert.deepEqual(result?.groups, []);
 });
+
+test("orders candidates by votes even when the TSE sequence disagrees", async () => {
+  const payload = await readEa20Fixture("ea20-president-br.json");
+  const candidates = payload.carg![0]!.agr.flatMap((group) => group.par).flatMap((party) => party.cand ?? []);
+  const last = candidates.reduce((min, c) => (Number(c.vap) < Number(min.vap) ? c : min));
+  last.vap = "999999";
+  const [result] = normalizeEa20(payload);
+  assert.equal(result?.candidates[0]?.votes, 999999);
+  const votes = result?.candidates.map((c) => c.votes) ?? [];
+  assert.deepEqual(votes, [...votes].sort((a, b) => b - a));
+});
+
+test("sums party totals when the group omits tvtn/tvtl", async () => {
+  const payload = await readEa20Fixture("ea20-deputy-federal-pr.json");
+  for (const group of payload.carg![0]!.agr) {
+    delete group.tvtn;
+    delete group.tvtl;
+  }
+  const [result] = normalizeEa20(payload);
+  assert.equal(result?.groups[0]?.nominalVotes, 16000);
+  assert.equal(result?.groups[0]?.partyListVotes, 2000);
+  assert.equal(result?.groups[0]?.votes, 18000);
+});

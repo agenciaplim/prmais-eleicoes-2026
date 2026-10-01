@@ -10,11 +10,11 @@ const statusLabel: Partial<Record<CandidateStatus, string>> = {
   alternate: "Suplente"
 };
 
-function Row({ candidate, compact }: { candidate: CandidateResult; compact: boolean }) {
+function Row({ candidate, position, compact }: { candidate: CandidateResult; position: number; compact: boolean }) {
   const label = statusLabel[candidate.status];
   return (
     <li className={compact ? "row row--compact" : "row"}>
-      <span className={candidate.rank === 1 ? "rank rank-lead" : "rank"}>{candidate.rank}</span>
+      <span className={position === 1 ? "rank rank-lead" : "rank"}>{position}</span>
       {!compact && <Avatar id={candidate.id} name={candidate.name} />}
       <div className="row-main">
         <span className="row-name">
@@ -40,11 +40,11 @@ export function CandidateList({ candidates, limit, compact = false, moreLabel = 
   const rest = candidates.slice(limit);
   return (
     <>
-      <ol className="rows">{top.map((c) => <Row key={c.id} candidate={c} compact={compact} />)}</ol>
+      <ol className="rows">{top.map((c, i) => <Row key={c.id} candidate={c} position={i + 1} compact={compact} />)}</ol>
       {rest.length > 0 && (
         <details className="more">
           <summary>{moreLabel} ({candidates.length})</summary>
-          <ol className="rows">{rest.map((c) => <Row key={c.id} candidate={c} compact={compact} />)}</ol>
+          <ol className="rows">{rest.map((c, i) => <Row key={c.id} candidate={c} position={limit + i + 1} compact={compact} />)}</ol>
         </details>
       )}
     </>

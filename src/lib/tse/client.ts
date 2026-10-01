@@ -504,7 +504,7 @@ export function createTseClient(config: TseClientConfig, fetchImplementation: Fe
   function buildPhotoUrl(request: TsePhotoRequest): URL {
     const { directoryId } = electionPath(request);
     const scope = request.scope === "br" ? "br" : normalizeUf(request.scope);
-    assertPattern(request.candidateId, /^\d{9,15}$/, "candidate ID");
+    assertPattern(request.candidateId, /^\d{6,15}$/, "candidate ID");
     return new URL(`${normalizedConfig.baseUrl}/${normalizedConfig.environment}/${request.cycle}/${directoryId}/fotos/${scope}/${request.candidateId}.jpeg`);
   }
 

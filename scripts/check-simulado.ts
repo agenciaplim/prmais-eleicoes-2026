@@ -47,7 +47,10 @@ async function main() {
   const presidentBr = await readLastKnownGood(cache, { scope: "BR", scopeType: "country", office: "president" });
   const firstId = presidentBr?.data.candidates[0]?.id;
   const photo = firstId ? await readPhoto(cache, firstId) : null;
-  console.log(`\nFoto do 1º colocado (${firstId}): ${photo ? `${photo.byteLength} bytes` : "NÃO encontrada — conferir o caminho das fotos"}`);
+  const photoUrl = firstId
+    ? client.buildPhotoUrl({ cycle: report.discovery.cycle, electionId: report.discovery.federalElectionId, scope: "br", candidateId: firstId }).href
+    : "-";
+  console.log(`\nFoto do 1º colocado (${firstId}): ${photo ? `${photo.byteLength} bytes` : `NÃO encontrada — URL tentada: ${photoUrl}`}`);
 
   console.log("\nÚltimas atualizações:");
   for (const item of (await readUpdates(cache)).slice(0, 8)) console.log(`  ${item.at}  ${item.text}`);

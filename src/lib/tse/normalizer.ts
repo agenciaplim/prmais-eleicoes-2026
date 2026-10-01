@@ -122,8 +122,10 @@ const groupTypeByTse = { f: "federation", i: "party", c: "coalition" } as const 
 // Group totals come from the TSE (tvtn nominal + tvtl party-list); percentages use valid votes.
 function normalizeGroups(office: Ea20Office, validVotes: number | null): PartyGroupResult[] {
   const groups = office.agr.map((group) => {
-    const nominalVotes = toNumber(group.tvtn ?? "0");
-    const partyListVotes = toNumber(group.tvtl ?? "0");
+    // Group totals are optional in EA20; when absent, sum the parties (tvtn is mandatory per party).
+    const nominalVotes = group.tvtn !== undefined ? toNumber(group.tvtn) : group.par.reduce((sum, party) => sum + toNumber(party.tvtn), 0);
+    const partyListVotes =
+      group.tvtl !== undefined ? toNumber(group.tvtl) : group.par.reduce((sum, party) => sum + toNumber(party.tvtl ?? "0"), 0);
     const federation = office.fed.find((item) => item.n === group.n);
     const acronym = group.tp === "f" ? federation?.sg ?? group.nm : group.tp === "i" ? group.par[0]!.sg : group.nm;
     return {
@@ -166,7 +168,8 @@ export function normalizeEa20(payload: Ea20Payload): ElectionResult[] {
     const candidates = office.agr
       .flatMap((group) => group.par)
       .flatMap((party) => (party.cand ?? []).map((candidate) => normalizeCandidate(candidate, party)))
-      .sort((left, right) => left.rank - right.rank);
+      // Votes first: the simulation publishes `seq` out of vote order; `seq` only breaks ties.
+      .sort((left, right) => right.votes - left.votes || left.rank - right.rank);
     const validVotes = payload.v.vv === undefined ? null : toNumber(payload.v.vv);
     const proportional = office.qe !== undefined;
 

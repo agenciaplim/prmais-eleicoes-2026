@@ -11,9 +11,9 @@ const photoSchema = z.object({
   storedAt: z.string().datetime({ offset: true }),
   data: z.string().min(4).max(MAX_BASE64).regex(/^[A-Za-z0-9+/]+={0,2}$/)
 });
-const indexSchema = z.object({ version: z.literal(1), ids: z.array(z.string().regex(/^\d{9,15}$/)) });
+const indexSchema = z.object({ version: z.literal(1), ids: z.array(z.string().regex(/^\d{6,15}$/)) });
 
-export const isCandidateId = (id: string) => /^\d{9,15}$/.test(id);
+export const isCandidateId = (id: string) => /^\d{6,15}$/.test(id);
 const photoKey = (id: string) => `${PREFIX}:${id}`;
 
 export async function readPhoto(cache: CacheStore, id: string): Promise<Uint8Array<ArrayBuffer> | null> {

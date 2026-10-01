@@ -295,3 +295,15 @@ Branches criadas em sequência, cada uma a partir da anterior, então `cloud/web
 - validação: 101 testes, typecheck e build passam (na cópia da nuvem); teste de carga local sem CDN: ~470 req/s com 200 clientes, zero erros de rede — valor indicativo, o teste real é contra o deploy;
 - resolvido (2026-10-01): projeto movido para `~/Projetos/prmais-eleicoes-starter`, fora do iCloud; `.git`, `.gitignore` e `.env.example` restaurados da pasta antiga; `git fsck` limpo; 101 testes, typecheck e build passam no Mac;
 - pendente: `node_modules` ainda traz cópias `* 2` do iCloud (inofensivas); rodar `rm -rf node_modules && pnpm install` quando conveniente; a pasta antiga em `~/Documents` pode ser apagada.
+
+## Prova no simulado (2026-10-01) e correções
+
+Execução de `check:simulado` no Mac (69 s, orçamento municipal de 45 s por cargo):
+
+- ok: descoberta (pleito 17801, federal 21270, estadual 21272), catálogo e os seis agregados promovidos; municípios 399/399 para Presidente e Governador sem falhas; atualizações geradas corretamente;
+- corrigido: `sqcand` do simulado tem 8 dígitos e a validação exigia 9–15, então nenhuma foto era tentada; agora aceita 6–15 dígitos (cliente, armazenamento e rota);
+- corrigido: o EA20 nem sempre traz `tvtn`/`tvtl` na agremiação (partidos isolados vinham com 0 voto); agora soma os partidos quando o total da agremiação está ausente;
+- corrigido: o simulado publica `seq` fora da ordem de votos (top 3 de Curitiba saía 7,74% / 8,07% / 8,08%); candidatos agora são ordenados por votos, com `seq` como desempate, e a posição exibida é a da lista;
+- script: quando a foto não é encontrada, `check:simulado` mostra a URL tentada;
+- validação: 103 testes e typecheck passam;
+- pendente: repetir `check:simulado` para confirmar fotos e a soma das agremiações = votos válidos; medir o tempo com `TSE_MUNICIPAL_BUDGET_MS=20000` para garantir que a coleta cabe em 60 s.

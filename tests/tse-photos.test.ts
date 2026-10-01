@@ -14,6 +14,7 @@ test("builds the photo URL only from validated parts", () => {
     client.buildPhotoUrl(request).href,
     "https://resultados-sim.tse.jus.br/simulado/simulado2026/ele2026/21270/fotos/br/10000000001.jpeg"
   );
+  assert.equal(client.buildPhotoUrl({ ...request, candidateId: "41592406" }).pathname.endsWith("/fotos/br/41592406.jpeg"), true);
   assert.throws(() => client.buildPhotoUrl({ ...request, candidateId: "../x" }), TseFetchError);
   assert.throws(() => client.buildPhotoUrl({ ...request, scope: "p/r" }), TseFetchError);
 });
