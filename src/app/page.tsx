@@ -106,13 +106,13 @@ export default async function Home() {
           </section>
 
           <aside>
-            {/* <LiveCoverage embed={live} /> */}
+            <LiveCoverage embed={live} /> 
             <UpdatesCard items={updates} />
             <article className="card card--search">
               <h2>Buscar município</h2>
               <MunicipalitySearch />
             </article>
-            <TvMode embed={live} />
+            {/* <TvMode embed={live} /> */}
           </aside>
         </div>
       </main>
