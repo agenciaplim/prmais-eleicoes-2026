@@ -20,6 +20,7 @@ function Soon() {
 }
 
 export function LiveCoverage({ embed }: { embed: LiveEmbed }) {
+return null;	
   return (
     <article className="card card--live">
       <header className="card-head">
