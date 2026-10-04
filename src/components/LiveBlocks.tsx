@@ -1,13 +1,16 @@
 import type { LiveEmbed } from "@/lib/live";
 
 function Player({ embed, title }: { embed: NonNullable<LiveEmbed>; title: string }) {
+  const delimiter = embed.src.includes("?") ? "&" : "?";
+  const autoplaySrc = `${embed.src}${delimiter}autoplay=1&mute=1`;
+
   return (
     <div className="video">
       <iframe
-        src={embed.src}
+        src={autoplaySrc}
         title={title}
         loading="lazy"
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
         referrerPolicy="strict-origin-when-cross-origin"
         allowFullScreen
       />
@@ -19,7 +22,7 @@ function Soon() {
   return <div className="placeholder video-placeholder">Transmissão em breve</div>;
 }
 
-export function LiveCoverage({ embed }: { embed: LiveEmbed }) {	
+export function LiveCoverage({ embed }: { embed: LiveEmbed }) {
   return (
     <article className="card card--live">
       <header className="card-head">
