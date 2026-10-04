@@ -19,8 +19,7 @@ function Soon() {
   return <div className="placeholder video-placeholder">Transmissão em breve</div>;
 }
 
-export function LiveCoverage({ embed }: { embed: LiveEmbed }) {
-return null;	
+export function LiveCoverage({ embed }: { embed: LiveEmbed }) {	
   return (
     <article className="card card--live">
       <header className="card-head">
